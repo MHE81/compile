@@ -254,6 +254,7 @@ public class Listener implements japyListener {
             Token token = ctx.getStop();
             int line = token.getLine() + 2;
             System.out.println("goto " + line);
+            System.out.println(line);
     }
 
     @Override
