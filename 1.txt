@@ -1,0 +1,69 @@
+## This is a comment ##
+### This is a multiline comment ###
+class MyClass begin
+    public field int x, y
+    private field double z
+
+    func myMethod(param1: int, param2: double, param3: string) returns bool begin
+        var a = 10, b = 20.5, d=75
+        var c = love(10)
+	mel = 10+c
+	d++
+        return true
+    end
+
+    func anotherMethod(init: string) returns string begin
+        sout("Hello, world!")
+	if (x<5)
+		c++
+	elif (c==9)
+		v++
+	elif (c>d)
+		d++
+	else
+		c++
+        return "Done"
+    end
+end
+
+MAIN class Amir begin
+    field string fati
+end
+
+public class MElika inherits Fateme begin
+    public field int x, y
+    private field double z
+
+    func myMethod(param1: int, param2: double) returns bool begin
+        var a = 10, b = 20.5
+        var c = a + b
+        return true
+    end
+
+    func anotherMethod(mel: string) returns string begin
+        sout("Hello, world!")
+	while(mel ==meli)
+		c=2
+		break
+        return "Done"
+    end
+end
+
+class Fateme begin
+    public field int x, y
+    private field double z
+
+    func myMethod(param1: int, param2: double) returns bool begin
+        var a = 10, b = 20.5
+        return true
+    end
+
+    func anotherMethod(init: int) returns string begin
+        sout("Hello, world!")
+        return "Done"
+    end
+    private func a (x: bool [], y: string, z: double) returns string begin
+	return b + c
+    end
+end
+
