@@ -37,6 +37,9 @@ public class MElika inherits Fateme begin
     func myMethod(param1: int, param2: double) returns bool begin
         var a = 10, b = 20.5
         var c = a + b
+	while(c == true)
+		c++
+		continue
         return true
     end
 

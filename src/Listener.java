@@ -4,12 +4,25 @@ import gen.japyParser;
 import java.util.Hashtable;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
-
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+
 public class Listener implements japyListener {
+    public Hashtable<String, String> class_table = new Hashtable<>();
+    public Hashtable<String, String> func_table = new Hashtable<>();
+    public Hashtable<String, String> if_table = new Hashtable<>();
+    public Hashtable<String, String> while_table = new Hashtable<>();
+
+    public static void insert(Hashtable<String, String> hashtable, String key, String value) {
+        hashtable.put(key, value);
+    }
+
+    public static void lookup(Hashtable<String, String> hashtable, String key) {
+        hashtable.get(key);
+    }
+
     @Override
     public void enterProgram(japyParser.ProgramContext ctx) {
         System.out.println("program started");
@@ -94,7 +107,7 @@ public class Listener implements japyListener {
         if(ctx.access_modifier()!= null){
             str = str.concat(","+ctx.access_modifier().getText());
         }
-        str = str.concat("parameters: [(" + ctx.param1.getText() + "," + ctx.typeP1.getText() + ")");
+        str = str.concat(", parameters: [(" + ctx.param1.getText() + "," + ctx.typeP1.getText() + ")");
         if(ctx.param2 !=null){
             str = str.concat(", (" + ctx.param2.getText() + "," + ctx.typeP2.getText() + ")");
 //            while (ctx.param2 != null) {
@@ -170,14 +183,21 @@ public class Listener implements japyListener {
 
     @Override
     public void enterOpenStatement(japyParser.OpenStatementContext ctx) {
+//        System.out.println(ctx.s1.getText());
     }
 
     @Override
     public void exitOpenStatement(japyParser.OpenStatementContext ctx) {
     }
-
     @Override
     public void enterStatement(japyParser.StatementContext ctx) {
+//        if(ctx.s1 != null){
+//            System.out.println(ctx.closedStatement().getText());
+//        }
+//        if(ctx.s2 != null){
+//            System.out.println(ctx.openStatement().getText());
+//        }
+
     }
 
     @Override
@@ -214,11 +234,26 @@ public class Listener implements japyListener {
 
     @Override
     public void exitStatementContinue(japyParser.StatementContinueContext ctx) {
+//       Token token = ctx.getStart();
+//            int line = token.getLine();
+//            System.out.println("Loop continues at line: " + line);
+
+        ParserRuleContext parent = ctx.getParent();
+        while (parent != null && !(parent instanceof japyParser.StatementClosedLoopContext)) {
+            parent = parent.getParent();
+        }
+        if (parent != null) {
+            Token token = ctx.getStart();
+            int line = token.getLine();
+            System.out.println("Loop continues at line: " + line);
+        }
     }
 
     @Override
     public void enterStatementBreak(japyParser.StatementBreakContext ctx) {
-//        System.out.println("goto "+ N);
+            Token token = ctx.getStop();
+            int line = token.getLine() + 2;
+            System.out.println("goto " + line);
     }
 
     @Override

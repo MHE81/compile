@@ -1,6 +1,7 @@
 import gen.japyLexer;
 import gen.japyListener;
 import gen.japyParser;
+import gen.japyBaseVisitor;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -12,6 +13,8 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+//        Visitor visitor = new Visitor();
+//        BreakLineVisitor visitor = new BreakLineVisitor();
         System.out.println("Hello world!");
         CharStream stream = CharStreams.fromFileName("1.txt");
         japyLexer lexer = new japyLexer(stream);
@@ -21,6 +24,7 @@ public class Main {
         ParseTree tree = parser.program();
         ParseTreeWalker walker = new ParseTreeWalker();
         japyListener listener = new Listener();
+//        visitor.visit(tree);
         walker.walk(listener, tree);
     }
 }
