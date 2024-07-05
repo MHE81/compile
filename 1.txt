@@ -38,7 +38,6 @@ public class MElika inherits Fateme begin
         var a = 10, b = 20.5
         var c = a + b
 	while(c == true)
-		c++
 		continue
         return true
     end
@@ -46,8 +45,10 @@ public class MElika inherits Fateme begin
     func anotherMethod(mel: string) returns string begin
         sout("Hello, world!")
 	while(mel ==meli)
-		c=2
-		break
+        if(c==2)
+            break
+        else
+		    c++
         return "Done"
     end
 end

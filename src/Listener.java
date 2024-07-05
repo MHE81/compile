@@ -1,7 +1,16 @@
 import gen.japyListener;
 import gen.japyListener;
 import gen.japyParser;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -101,26 +110,75 @@ public class Listener implements japyListener {
 //        return str + multi_param(ctx);
 //    }
 
+    public static String concatenateParameters(String methodDeclaration) {
+        // Regular expression to match the parameter list in the method declaration
+        String paramPattern = "\\(\\s*(.*?)\\s*\\)";
+
+        // Compile the pattern
+        Pattern pattern = Pattern.compile(paramPattern);
+
+        // Match the pattern with the method declaration
+        Matcher matcher = pattern.matcher(methodDeclaration);
+
+        if (!matcher.find()) {
+            return "";
+        }
+
+        String paramList = matcher.group(1);
+
+        if (paramList.isEmpty()) {
+            return "";
+        }
+
+        // Split the parameter list by comma
+        String[] params = paramList.split(",");
+
+        // Initialize an empty string for concatenation
+        StringBuilder concatenatedParams = new StringBuilder();
+
+        // Iterate over each parameter and concatenate it with its type
+        for (String param : params) {
+            // Split each parameter by ':' to separate parameter name and type
+            String[] paramParts = param.trim().split(":");
+            if (paramParts.length == 2) {
+                concatenatedParams.append(", (")
+                        .append(paramParts[0].trim())
+                        .append(", ")
+                        .append(paramParts[1].trim())
+                        .append(")");
+            }
+        }
+
+        // Return the concatenated string
+        return concatenatedParams.toString();
+    }
+
     @Override
     public void enterMethodDeclaration(japyParser.MethodDeclarationContext ctx) {
         String str = "<function '" + ctx.methodName.getText()+"'";
         if(ctx.access_modifier()!= null){
             str = str.concat(","+ctx.access_modifier().getText());
         }
-        str = str.concat(", parameters: [(" + ctx.param1.getText() + "," + ctx.typeP1.getText() + ")");
-        if(ctx.param2 !=null){
-            str = str.concat(", (" + ctx.param2.getText() + "," + ctx.typeP2.getText() + ")");
+//        int numParams = countParameters(ctx.getText());
+//        str = str.concat(", parameters: [(" + ctx.param1.getText() + "," + ctx.typeP1.getText() + ")");
+//        for (int i = 0; i < numParams-1; i++) {
+//            if(ctx.param2 !=null){
+                str = str.concat(concatenateParameters(ctx.getText()));
 //            while (ctx.param2 != null) {
 //                str = str.concat(", (" + ctx.param2.getText() + "," + ctx.typeP2.getText() + ")");
 //            }
-        }
+//            }
+//        }
+
+//        System.out.println("Number of parameters: " + numParams);
         System.out.println(str + "]>");
     }
 
     @Override
     public void exitMethodDeclaration(japyParser.MethodDeclarationContext ctx) {
         if(ctx.s != null) {
-            System.out.println("</function return (" + ctx.s.getText() + "," + ctx.t.getText() + ")>");
+//            String my_return = ctx.s.getText().replace("return", "");
+            System.out.println("</function return (" + ctx.s.s1.s6.e.getText() + "," + ctx.t.getText() + ")>");
         }
     }
 
@@ -135,39 +193,92 @@ public class Listener implements japyListener {
     public void exitClosedStatement(japyParser.ClosedStatementContext ctx) {
     }
 
-    @Override
-    public void enterClosedConditional(japyParser.ClosedConditionalContext ctx) {
+    public static String concatenateElifConditions(String conditionalStatement) {
+        // Regular expression to match the 'elif' statements
+        String elifPattern = "elif\\s*\\((.*?)\\)";
+
+        // Compile the pattern
+        Pattern pattern = Pattern.compile(elifPattern);
+
+        // Match the pattern with the conditional statement
+        Matcher matcher = pattern.matcher(conditionalStatement);
+
+        // Initialize a StringBuilder to concatenate elif conditions
+        StringBuilder concatenatedElifConditions = new StringBuilder();
+
+        // Count the number of 'elif' statements
+        int count = 0;
+        while (matcher.find()) {
+            count++;
+            String elifCondition = matcher.group(1).trim();
+            String str2 = "<elif condition: <" + elifCondition + ">>";
+            concatenatedElifConditions.append(str2).append("\n");
+        }
+
+        // Print the count (optional, to verify the count)
+        System.out.println("Number of 'elif' statements: " + count);
+
+        return concatenatedElifConditions.toString();
+    }
+
+    public void enterClosedConditional_if(japyParser.ClosedConditionalContext ctx){
         String str = "<if condition: <" + ctx.ifExp.getText() + "> ";
 //        str = str.concat();
         System.out.println(str);
-//        System.out.println(ctx.ifStat.getText());
-        if(ctx.elifExp != null) {
-            String str2 = "<elif condition: <" + ctx.elifExp.getText() + ">";
+    }
+    public void enterClosedConditional_elif(japyParser.ClosedConditionalContext ctx) {
+        if (ctx.elifExp != null) {
+            String str2 = concatenateElifConditions(ctx.getText());
             System.out.println(str2);
-//            System.out.println(ctx.elifStat.getText());
         }
+    }
+    public void enterClosedConditional_else(japyParser.ClosedConditionalContext ctx){
         String str3 = "<else>";
         System.out.println(str3);
-//        System.out.println(ctx.elseStmt.getText());
+    }
+
+
+    @Override
+    public void enterClosedConditional(japyParser.ClosedConditionalContext ctx) {
+//        enterClosedConditional_if(ctx);
+//        enterClosedConditional_elif(ctx);
+//        enterClosedConditional_else(ctx);
+////        int numElifs = countElifs(ctx.getText());
+////        System.out.println("Number of 'elif' statements: " + numElifs);
+//        //        System.out.println(ctx.ifStat.getText());
+////        for (int i = 0; i < numElifs; i++) {
+//            if(ctx.elifExp != null) {
+//                String str2 = concatenateElifConditions(ctx.getText());
+//                System.out.println(str2);
+////            System.out.println(ctx.elifStat.getText());
+//            }
+////        }
+//        String str3 = "<else>";
+//        System.out.println(str3);
+////        System.out.println(ctx.elseStmt.getText());
     }
 
     @Override
     public void exitClosedConditional(japyParser.ClosedConditionalContext ctx) {
+//        enterClosedConditional_if(ctx);
+//        enterClosedConditional_elif(ctx);
+//        enterClosedConditional_else(ctx);
         System.out.println("</else>");
         System.out.println("</if>");
     }
-
-    @Override
-    public void enterOpenConditional(japyParser.OpenConditionalContext ctx) {
+    public void enterOpenConditional_if(japyParser.OpenConditionalContext ctx) {
         String str = "<if condition: <" + ctx.ifExp.getText() + "> ";
 //        str = str.concat();
         System.out.println(str);
-//        System.out.println(ctx.ifStat.getText());
+    }
+    public void enterOpenConditional_elif(japyParser.OpenConditionalContext ctx) {
         if(ctx.elifExp != null) {
-            String str2 = "<elif condition: <" + ctx.elifExp.getText() + ">";
+            String str2 = concatenateElifConditions(ctx.getText());;
             System.out.println(str2);
 //            System.out.println(ctx.elifStat.getText());
         }
+    }
+    public void enterOpenConditional_else(japyParser.OpenConditionalContext ctx) {
         if(ctx.elseStmt != null ){
             String str3 = "<else>";
             System.out.println(str3);
@@ -176,7 +287,31 @@ public class Listener implements japyListener {
     }
 
     @Override
+    public void enterOpenConditional(japyParser.OpenConditionalContext ctx) {
+//        enterOpenConditional_if(ctx);
+//        enterOpenConditional_elif(ctx);
+//        enterOpenConditional_else(ctx);
+//        String str = "<if condition: <" + ctx.ifExp.getText() + "> ";
+////        str = str.concat();
+//        System.out.println(str);
+////        System.out.println(ctx.ifStat.getText());
+//        if(ctx.elifExp != null) {
+//            String str2 = "<elif condition: <" + ctx.elifExp.getText() + ">";
+//            System.out.println(str2);
+////            System.out.println(ctx.elifStat.getText());
+//        }
+//        if(ctx.elseStmt != null ){
+//            String str3 = "<else>";
+//            System.out.println(str3);
+////            System.out.println(ctx.elseStmt.getText());
+//        }
+    }
+
+    @Override
     public void exitOpenConditional(japyParser.OpenConditionalContext ctx) {
+//        enterOpenConditional_if(ctx);
+//        enterOpenConditional_elif(ctx);
+//        enterOpenConditional_else(ctx);
         System.out.println("</else>");
         System.out.println("</if>");
     }
@@ -202,7 +337,6 @@ public class Listener implements japyListener {
 
     @Override
     public void exitStatement(japyParser.StatementContext ctx) {
-
     }
 
     @Override
@@ -243,18 +377,25 @@ public class Listener implements japyListener {
             parent = parent.getParent();
         }
         if (parent != null) {
-            Token token = ctx.getStart();
+            Token token = parent.getStart();
             int line = token.getLine();
-            System.out.println("Loop continues at line: " + line);
+            System.out.println("goto: " + line);
         }
     }
 
+
+
     @Override
     public void enterStatementBreak(japyParser.StatementBreakContext ctx) {
-            Token token = ctx.getStop();
-            int line = token.getLine() + 2;
-            System.out.println("goto " + line);
-            System.out.println(line);
+        ParserRuleContext parent = ctx.getParent();
+        while (parent != null && !(parent instanceof japyParser.StatementClosedLoopContext)) {
+            parent = parent.getParent();
+        }
+        if (parent != null) {
+            Token token = parent.getStop();
+            int line = token.getLine()+1;
+            System.out.println("goto: " + line);
+        }
     }
 
     @Override
@@ -263,7 +404,8 @@ public class Listener implements japyListener {
 
     @Override
     public void enterStatementReturn(japyParser.StatementReturnContext ctx) {
-        System.out.println(ctx.e.getText());
+//        String my_return = ctx.e.getText().replace();
+//        System.out.println();
     }
 
     @Override
