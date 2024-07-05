@@ -1,3 +1,4 @@
+import gen.japyLexer;
 import gen.japyListener;
 import gen.japyListener;
 import gen.japyParser;
@@ -334,18 +335,47 @@ public class Listener implements japyListener {
 //        }
 
     }
-
     @Override
     public void exitStatement(japyParser.StatementContext ctx) {
     }
 
+    /*public static int countIDsInStatementVarDef(String code) {
+        // Create lexer and parser
+        japyLexer lexer = new japyLexer(CharStreams.fromString(code));
+        japyParser parser = new japyParser(new CommonTokenStream(lexer));
+
+        // Parse the input to get the parse tree
+        japyParser.StatementVarDefContext statementVarDefContext = parser.statementVarDef();
+
+        // Return the number of IDs
+        return statementVarDefContext.ID().size();
+    }
+*/
+    public static void countIDsInStatementVarDef(japyParser.StatementVarDefContext ctx) {
+        // Return the number of ID tokens in the context
+//        return ctx.ID().size();
+        for (int i = 0; i < ctx.ID().size(); i++) {
+            String expression = ctx.expression(i).getText();
+            String id = ctx.ID(i).getText();
+            System.out.print(expression + "-> (" + id + ", var)");
+            if (i==0){
+                System.out.print(",");
+            }
+        }
+        System.out.println("");
+    }
     @Override
     public void enterStatementVarDef(japyParser.StatementVarDefContext ctx) {
-        String str = ctx.e1.getText() + "-> (" + ctx.i1.getText() + ", " + "var) ";
-        if(ctx.i2 != null){
-            str = str.concat("," + ctx.e2.getText() + "-> (" + ctx.i2.getText() + ", " + "var)");
-        }
-        System.out.println(str);
+        countIDsInStatementVarDef(ctx);
+//        String str = ctx.e1.getText() + "-> (" + ctx.i1.getText() + ", " + "var) ";
+//        int var = countIDsInStatementVarDef(ctx);
+//        if(ctx.i2 != null){
+//            for (int i = 0; i <var-1; i++) {
+//                str = str.concat("," + ctx.e2.getText() + "-> (" + ctx.i2.getText() + ", " + "var)");
+//            }
+//        }
+//        System.out.println(var);
+//        System.out.println(str);
     }
 
     @Override
