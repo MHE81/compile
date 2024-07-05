@@ -13,8 +13,6 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-//        Visitor visitor = new Visitor();
-//        BreakLineVisitor visitor = new BreakLineVisitor();
         System.out.println("Hello world!");
         CharStream stream = CharStreams.fromFileName("1.txt");
         japyLexer lexer = new japyLexer(stream);
@@ -24,7 +22,11 @@ public class Main {
         ParseTree tree = parser.program();
         ParseTreeWalker walker = new ParseTreeWalker();
         japyListener listener = new Listener();
-//        visitor.visit(tree);
-        walker.walk(listener, tree);
+        japyListener hash_table = new Hash_table();
+//        System.out.println("Faze1");
+//        walker.walk(listener, tree);
+        System.out.println("Faze2");
+        System.out.print("---------------1.txt-------------------");
+        walker.walk(hash_table,tree);
     }
 }

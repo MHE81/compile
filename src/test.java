@@ -1,3 +1,4 @@
+import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import java.util.Hashtable;
 
 public class test {
@@ -9,27 +10,13 @@ public class test {
         hashtable.put("Apple", 1);
         hashtable.put("Banana", 2);
         hashtable.put("Cherry", 3);
-
-        System.out.println(hashtable);
-        // Accessing elements from the Hashtable
-        System.out.println("Value for Apple: " + hashtable.get("Apple"));
-        System.out.println("Value for Banana: " + hashtable.get("Banana"));
-
-        // Checking if a key exists
-        if (hashtable.containsKey("Cherry")) {
-            System.out.println("Hashtable contains key 'Cherry'");
+        for (String key: hashtable.keySet()) {
+            System.out.println("key = " + key + ", value =" + hashtable.get(key));
         }
-
-        // Iterating over the Hashtable
-        for (String key : hashtable.keySet()) {
-            System.out.println("Key: " + key + ", Value: " + hashtable.get(key));
-        }
-
-        // Removing an element
-        hashtable.remove("Banana");
-
-        // Checking the size of the Hashtable
-        System.out.println("Size of Hashtable: " + hashtable.size());
+//        for (int i = 0; i <hashtable.size(); i++) {
+//
+//        }
+//        System.out.println(hashtable);
     }
 }
 
