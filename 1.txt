@@ -18,6 +18,8 @@ class MyClass begin
 		v++
 	elif (c>d)
 		d++
+    elif (b==10)
+        d++
 	else
 		c++
         return "Done"
@@ -44,7 +46,7 @@ public class MElika inherits Fateme begin
         sout("Hello, world!")
 	while(mel ==meli)
         if(c==2)
-            break
+            var b = 3, c=10, v= 2
         else
 		    c++
         return "Done"

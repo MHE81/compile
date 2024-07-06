@@ -7,6 +7,9 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Hash_table implements japyListener {
 
@@ -182,11 +185,7 @@ public class Hash_table implements japyListener {
 
     @Override
     public void enterMethodDeclaration(japyParser.MethodDeclarationContext ctx) {
-        Token token1 = ctx.getStart();
-        Token token2 = ctx.getStop();
-        int line1 = token1.getLine();
-        int line2 = token2.getLine();
-        System.out.println(ctx.methodName.getText() + ":(" + line1 + "," + line2 + ")");
+
 
 
 //        // Initialize parameter count
@@ -209,13 +208,25 @@ public class Hash_table implements japyListener {
             str = str.concat("(accessModifier: " + ctx.access_modifier().getText() + ")");
         }
         str = str.concat("(return: " + ctx.t.getText() + ")");
-
-//        str = str.concat("\n parameters: [" + "[(index " + i + "), (name " + ctx.param1.getText() + "), (type: " + ctx.typeP1.getText());
-
+        int index = 0;
+        if (ctx.param1 != null){
+            str = str.concat("\n parameters: [" + "[(index: " + index + "), (name: " + ctx.param1.getText() + "), (type: " + ctx.typeP1.getText()+ ")");
+            index++;
+            if (ctx.param2 != null){
+                str = str.concat("\n parameters: [" + "[(index: " + index + "), (name: " + ctx.param2.getText() + "), (type: " + ctx.typeP2.getText() + ")");
+                index++;
+            }
+        }
         func_table.put("function_" + ctx.methodName.getText(), str);
         for (String key: func_table.keySet()) {
             System.out.println("key = " + key + ", value =" + func_table.get(key));
         }
+        Token token1 = ctx.getStart();
+        Token token2 = ctx.getStop();
+        int line1 = token1.getLine();
+        int line2 = token2.getLine();
+        System.out.println(ctx.methodName.getText() + ":(" + line1 + "," + line2 + ")");
+        System.out.println("!NO KEY FOUND!");
     }
 
     @Override
@@ -232,12 +243,114 @@ public class Hash_table implements japyListener {
     public void exitClosedStatement(japyParser.ClosedStatementContext ctx) {
 
     }
+    public void enterClosedConditional_if(japyParser.ClosedConditionalContext ctx){
+        Hashtable<String, String> if_table = new Hashtable<>();
+        Token token1 = ctx.getStart();
+        Token token2 = ctx.getStop();
+        int line1 = token1.getLine();
+        int line2 = token2.getLine();
+        System.out.println("if: (" + line1 + "," + line2 + ")");
+        if (ctx.ifStat.s7 != null){
+            for (int i = 0; i < ctx.ifStat.s7.ID().size(); i++) {
+                String str = "";
+                String id = ctx.ifStat.s7.ID(i).getText();
+                str = str.concat("(name: " + id + ")(first appearance: " + (line1+1) +")");
+                if_table.put("var_" + id , str);
+
+            }
+        }
+        for (String key: if_table.keySet()) {
+            System.out.println("key = " + key + ", value =" + if_table.get(key));
+        }
+    }
+
+    public static void concatenateElifConditions(String conditionalStatement, japyParser.ClosedConditionalContext ctx) {
+        Hashtable<String, String> elif_table = new Hashtable<>();
+        Token token1 = ctx.getStart();
+        Token token2 = ctx.getStop();
+        int line1 = token1.getLine();
+        int line2 = token2.getLine();
+        System.out.println("elif: (" + line1 + "," + line2 + ")");
+        // Regular expression to match the 'elif' statements
+        String elifPattern = "elif\\s*\\((.*?)\\)";
+
+        // Compile the pattern
+        Pattern pattern = Pattern.compile(elifPattern);
+
+        // Match the pattern with the conditional statement
+        Matcher matcher = pattern.matcher(conditionalStatement);
+
+        // Initialize a StringBuilder to concatenate elif conditions
+//        StringBuilder concatenatedElifConditions = new StringBuilder();
+
+        // Count the number of 'elif' statements
+        int count = 0;
+        while (matcher.find()) {
+            count++;
+            String elifCondition = matcher.group(1).trim();
+            String str2 = "(name: " + ctx.ifStat.getText() + ")(first appearance: " + (line1+1) +")";
+            elif_table.put("var_" + ctx.ifStat.getText(), str2);
+            for (String key: elif_table.keySet()) {
+                System.out.println("key = " + key + ", value =" + elif_table.get(key));
+            }
+//            concatenatedElifConditions.append(str2).append("\n");
+        }
+
+        // Print the count (optional, to verify the count)
+        System.out.println("Number of 'elif' statements: " + count);
+
+//        return concatenatedElifConditions.toString();
+    }
+    public void enterClosedConditional_elif(japyParser.ClosedConditionalContext ctx) {
+//        System.out.println("elifs"+ctx.expression().size());
+
+        if (ctx.elifExp != null) {
+//            concatenateElifConditions(ctx.getText(), ctx);
+            Hashtable<String, String> elif_table = new Hashtable<>();
+            for (int i = 0; i <ctx.expression().size(); i++) {
+                Token token1 = ctx.getStart();
+                Token token2 = ctx.getStop();
+                int line1 = token1.getLine();
+                int line2 = token2.getLine();
+                System.out.println("elif: (" + line1 + "," + line2 + ")");
+                if (ctx.elifStat.s7 != null){
+                    for (int j = 0; j < ctx.elifStat.s7.ID().size(); j++) {
+                        String str = "";
+                        String id = ctx.elifStat.s7.ID(j+1).getText();
+                        str = str.concat("(name: " + id + ")(first appearance: " + (line1+1) +")");
+                        elif_table.put("var_" + id , str);
+
+                    }
+                }
+                for (String key: elif_table.keySet()) {
+                    System.out.println("key = " + key + ", value =" + elif_table.get(key));
+                }
+
+            }
+        }
+    }
+    public void enterClosedConditional_else(japyParser.ClosedConditionalContext ctx){
+        Hashtable<String, String> else_table = new Hashtable<>();
+        Token token1 = ctx.getStart();
+        Token token2 = ctx.getStop();
+        int line1 = token1.getLine();
+        int line2 = token2.getLine();
+        System.out.println("else: (" + line1 + "," + line2 + ")");
+        String str = "";
+        str = str.concat("(name: " + ctx.elseStmt.getText() + ")(first appearance: " + (line1+1) +")");
+        else_table.put("var_" + ctx.elseStmt.getText(), str);
+        for (String key: else_table.keySet()) {
+            System.out.println("key = " + key + ", value =" + else_table.get(key));
+        }
+    }
 
     @Override
     public void enterClosedConditional(japyParser.ClosedConditionalContext ctx) {
-        Hashtable<String, String> if_table = new Hashtable<>();
-        String str = "";
-        
+//        String str = "";
+        enterClosedConditional_if(ctx);
+        enterClosedConditional_elif(ctx);
+        enterClosedConditional_else(ctx);
+
     }
 
     @Override
@@ -245,10 +358,91 @@ public class Hash_table implements japyListener {
 
     }
 
+    public static void concatenateElifConditions(String conditionalStatement, japyParser.OpenConditionalContext ctx) {
+        Hashtable<String, String> elif_table = new Hashtable<>();
+        Token token1 = ctx.getStart();
+        Token token2 = ctx.getStop();
+        int line1 = token1.getLine();
+        int line2 = token2.getLine();
+        System.out.println("elif: (" + line1 + "," + line2 + ")");
+        // Regular expression to match the 'elif' statements
+        String elifPattern = "elif\\s*\\((.*?)\\)";
+
+        // Compile the pattern
+        Pattern pattern = Pattern.compile(elifPattern);
+
+        // Match the pattern with the conditional statement
+        Matcher matcher = pattern.matcher(conditionalStatement);
+
+        // Initialize a StringBuilder to concatenate elif conditions
+//        StringBuilder concatenatedElifConditions = new StringBuilder();
+
+        // Count the number of 'elif' statements
+        int count = 0;
+        while (matcher.find()) {
+            count++;
+            String elifCondition = matcher.group(1).trim();
+            String str2 = "(name: " + ctx.ifStat.getText() + ")(first appearance: " + (line1+1) +")";
+            elif_table.put("var_" + ctx.ifStat.getText(), str2);
+            for (String key: elif_table.keySet()) {
+                System.out.println("key = " + key + ", value =" + elif_table.get(key));
+            }
+//            concatenatedElifConditions.append(str2).append("\n");
+        }
+
+        // Print the count (optional, to verify the count)
+        System.out.println("Number of 'elif' statements: " + count);
+
+//        return concatenatedElifConditions.toString();
+    }
+    public void enterClosedConditional_if(japyParser.OpenConditionalContext ctx){
+        Hashtable<String, String> if_table = new Hashtable<>();
+        Token token1 = ctx.getStart();
+        Token token2 = ctx.getStop();
+        int line1 = token1.getLine();
+        int line2 = token2.getLine();
+        System.out.println("if: (" + line1 + "," + line2 + ")");
+        String str = "";
+        str = str.concat("(name: " + ctx.ifStat.getText() + ")(first appearance: " + (line1+1) +")");
+        if_table.put("var_" + ctx.ifStat.getText(), str);
+        for (String key: if_table.keySet()) {
+            System.out.println("key = " + key + ", value =" + if_table.get(key));
+        }
+
+//        String str = "<if condition: <" + ctx.ifExp.getText() + "> ";
+//        System.out.println(str);
+    }
+    public void enterClosedConditional_elif(japyParser.OpenConditionalContext ctx) {
+        if (ctx.elifExp != null) {
+            concatenateElifConditions(ctx.getText(), ctx);
+//            enterClosedConditional_elif(ctx);
+//            System.out.println(str2);
+//            Token token1 = ctx.getStart();
+//            Token token2 = ctx.getStop();
+//            int line1 = token1.getLine();
+//            int line2 = token2.getLine();
+//            System.out.println("elif: (" + line1 + "," + line2 + ")");
+        }
+    }
+    public void enterClosedConditional_else(japyParser.OpenConditionalContext ctx){
+        Hashtable<String, String> else_table = new Hashtable<>();
+        Token token1 = ctx.getStart();
+        Token token2 = ctx.getStop();
+        int line1 = token1.getLine();
+        int line2 = token2.getLine();
+        System.out.println("else: (" + line1 + "," + line2 + ")");
+        String str = "";
+        str = str.concat("(name: " + ctx.elifStat.getText() + ")(first appearance: " + (line1+1) +")");
+        else_table.put("var_" + ctx.elifStat.getText(), str);
+        for (String key: else_table.keySet()) {
+            System.out.println("key = " + key + ", value =" + else_table.get(key));
+        }
+    }
     @Override
     public void enterOpenConditional(japyParser.OpenConditionalContext ctx) {
-        Hashtable<String, String> if_table = new Hashtable<>();
-    }
+        enterClosedConditional_if(ctx);
+        enterClosedConditional_elif(ctx);
+        enterClosedConditional_else(ctx);    }
 
     @Override
     public void exitOpenConditional(japyParser.OpenConditionalContext ctx) {
@@ -327,7 +521,8 @@ public class Hash_table implements japyListener {
 
     @Override
     public void enterStatementClosedLoop(japyParser.StatementClosedLoopContext ctx) {
-        Hashtable<String, String> while_table = new Hashtable<>();
+//        Hashtable<String, String> while_table = new Hashtable<>();
+        System.out.println("!NO KEY FOUND!");
     }
 
     @Override
