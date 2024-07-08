@@ -12,17 +12,28 @@ class MyClass begin
 
     func anotherMethod(init: string) returns string begin
         sout("Hello, world!")
-	if (x<5)
+	if (x<5 && b==3) begin
+            if(c==9)begin
+                v++
+                while(c==8)
+                    x++
+            end
+            elif(s==10)
+                a++
 		c++
+        sout("hiiiiiii")
+    end
 	elif (c==9)
 		v++
 	elif (c>d)
 		d++
     elif (b==10)
         d++
-	else
+	else begin
 		c++
-        return "Done"
+        m++
+        end
+        return "Done" || true
     end
 end
 
@@ -37,8 +48,10 @@ public class MElika inherits Fateme begin
     func myMethod(param1: int, param2: double) returns bool begin
         var a = 10, b = 20.5
         var c = a + b
-	while(c == true)
+	while(c == true) begin
+        c++
 		continue
+        end
         return true
     end
 

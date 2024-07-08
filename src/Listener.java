@@ -53,14 +53,14 @@ public class Listener implements japyListener {
     @Override
     public void enterFieldDeclaration(japyParser.FieldDeclarationContext ctx) {
         String str = ctx.fieldName.getText();
-        if(ctx.ii != null){
+//        if(ctx.ii != null){
 //            List id = printNumberOfIIs(ctx.getText());
-            List idd = ctx.ID().subList(1, ctx.ID().size());
-            System.out.println(idd);
-            for (Object o : idd) {
-                str = str.concat("," + o);
-            }
+        List idd = ctx.ID().subList(1, ctx.ID().size());
+//        System.out.println(idd);
+        for (Object o : idd) {
+            str = str.concat("," + o);
         }
+//        }
         str = str.concat("(field");
         if(ctx.access_modifier() != null){
             str =str.concat(", "+ ctx.access_modifier().getText());
@@ -144,9 +144,40 @@ public class Listener implements japyListener {
 
     @Override
     public void enterClosedStatement(japyParser.ClosedStatementContext ctx) {
-        if(ctx.s1 != null){
-            System.out.println(ctx.s1.getText());
-        }
+//        if(ctx.s1 != null){
+//            enterStatementBlock(ctx.s1);
+//        }
+//        if (ctx.conditionalStat != null ){
+//            enterClosedConditional(ctx.conditionalStat);
+//        }
+//        if(ctx.s3 != null){
+//            enterStatementClosedLoop(ctx.s3);
+//        }
+//        if(ctx.s4 != null){
+//            enterStatementWrite(ctx.s4);
+//        }
+//        if(ctx.s5 != null){
+//            enterStatementAssignment(ctx.s5);
+//        }
+//        if(ctx.s6 != null){
+//            enterStatementReturn(ctx.s6);
+//        }
+//        if(ctx.s7 != null){
+//            enterStatementVarDef(ctx.s7);
+//        }
+//        if(ctx.s8 != null){
+//            enterStatementContinue(ctx.s8);
+//        }
+//        if(ctx.s9 != null){
+//            enterStatementBreak(ctx.s9);
+//        }
+//        if(ctx.incStat != null){
+//            enterStatementInc(ctx.incStat);
+//        }
+//        if(ctx.decStat != null){
+//            enterStatementDec(ctx.decStat);
+//        }
+
     }
 
     @Override
@@ -177,7 +208,6 @@ public class Listener implements japyListener {
 
         // Print the count (optional, to verify the count)
         System.out.println("Number of 'elif' statements: " + count);
-
         return concatenatedElifConditions.toString();
     }
 
@@ -188,7 +218,7 @@ public class Listener implements japyListener {
     public void enterClosedConditional_elif(japyParser.ClosedConditionalContext ctx) {
         if (ctx.elifExp != null) {
             String str2 = concatenateElifConditions(ctx.getText());
-            System.out.println(str2);
+            System.out.print(str2);
         }
     }
     public void enterClosedConditional_else(japyParser.ClosedConditionalContext ctx){
@@ -196,12 +226,14 @@ public class Listener implements japyListener {
         System.out.println(str3);
     }
 
-
     @Override
     public void enterClosedConditional(japyParser.ClosedConditionalContext ctx) {
         enterClosedConditional_if(ctx);
+//        enterClosedStatement(ctx.ifStat);
         enterClosedConditional_elif(ctx);
+//        enterClosedStatement(ctx.elifStat);
         enterClosedConditional_else(ctx);
+//        enterClosedStatement(ctx.elseStmt);
     }
 
     @Override
@@ -213,13 +245,36 @@ public class Listener implements japyListener {
         String str = "<if condition: <" + ctx.ifExp.getText() + "> ";
         System.out.println(str);
     }
-    public void enterOpenConditional_elif(japyParser.OpenConditionalContext ctx) {
+    public void enterOpenConditional_if_elif(japyParser.OpenConditionalContext ctx) {
+        String str = "<if condition: <" + ctx.secondIfStat.getText() + "> ";
+        System.out.println(str);
         if(ctx.elifExp != null) {
             String str2 = concatenateElifConditions(ctx.getText());;
             System.out.println(str2);
+//            String str2 = "";
+//            for (int i = 0; i <ctx.expression().size()-1; i++) {
+//                str2 = "<elif condition: <" + ctx.elifExp.getText() + ">>";
+//            }
+            System.out.println(str2);
         }
+        String str2 = "<elif condition: " + ctx.lastElifExp.getText();
+        System.out.println(str2);
     }
+//    public void enterOpenConditional_elif(japyParser.OpenConditionalContext ctx) {
+//
+//    }
     public void enterOpenConditional_else(japyParser.OpenConditionalContext ctx) {
+        String str = "<if condition: <" + ctx.thirdIfStat.getText() + "> ";
+        System.out.println(str);
+        if(ctx.elifExp != null) {
+            String str2 = concatenateElifConditions(ctx.getText());;
+            System.out.println(str2);
+//            String str2 = "";
+//            for (int i = 0; i <ctx.expression().size()-1; i++) {
+//                str2 = "<elif condition: <" + ctx.elifExp.getText() + ">>";
+//            }
+            System.out.println(str2);
+        }
         if(ctx.elseStmt != null ){
             String str3 = "<else>";
             System.out.println(str3);
@@ -229,8 +284,12 @@ public class Listener implements japyListener {
     @Override
     public void enterOpenConditional(japyParser.OpenConditionalContext ctx) {
         enterOpenConditional_if(ctx);
-        enterOpenConditional_elif(ctx);
-        enterOpenConditional_else(ctx);
+        if (ctx.elifExp != null){
+            enterOpenConditional_if_elif(ctx);
+        }
+        if (ctx.elseStmt != null){
+            enterOpenConditional_else(ctx);
+        }
     }
 
     @Override
@@ -248,14 +307,32 @@ public class Listener implements japyListener {
     }
     @Override
     public void enterStatement(japyParser.StatementContext ctx) {
+//        if (ctx.s1 != null){
+//            if (ctx.s1.statementBlock() != null){
+//                enterStatementBlock(ctx.s1.s1);
+//            }
+//        }
     }
     @Override
     public void exitStatement(japyParser.StatementContext ctx) {
     }
 
-    public static void countIDsInStatementVarDef(japyParser.StatementVarDefContext ctx) {
-        // Return the number of ID tokens in the context
-//        return ctx.ID().size();
+//    public static void countIDsInStatementVarDef(japyParser.StatementVarDefContext ctx) {
+//        // Return the number of ID tokens in the context
+////        return ctx.ID().size();
+//        for (int i = 0; i < ctx.ID().size(); i++) {
+//            String expression = ctx.expression(i).getText();
+//            String id = ctx.ID(i).getText();
+//            System.out.print(expression + "-> (" + id + ", var)");
+//            if (i != ctx.ID().size()-1){
+//                System.out.print(", ");
+//            }
+//        }
+//        System.out.println("");
+//    }
+    @Override
+    public void enterStatementVarDef(japyParser.StatementVarDefContext ctx) {
+//        countIDsInStatementVarDef(ctx);
         for (int i = 0; i < ctx.ID().size(); i++) {
             String expression = ctx.expression(i).getText();
             String id = ctx.ID(i).getText();
@@ -266,10 +343,6 @@ public class Listener implements japyListener {
         }
         System.out.println("");
     }
-    @Override
-    public void enterStatementVarDef(japyParser.StatementVarDefContext ctx) {
-        countIDsInStatementVarDef(ctx);
-    }
 
     @Override
     public void exitStatementVarDef(japyParser.StatementVarDefContext ctx) {
@@ -277,6 +350,9 @@ public class Listener implements japyListener {
 
     @Override
     public void enterStatementBlock(japyParser.StatementBlockContext ctx) {
+        for (int i = 0; i <ctx.statement().size(); i++) {
+            enterStatement(ctx.s);
+        }
     }
 
     @Override
@@ -322,6 +398,7 @@ public class Listener implements japyListener {
 
     @Override
     public void enterStatementReturn(japyParser.StatementReturnContext ctx) {
+//        System.out.println(c);
     }
 
     @Override
@@ -384,7 +461,8 @@ public class Listener implements japyListener {
 
     @Override
     public void enterStatementDec(japyParser.StatementDecContext ctx) {
-
+        String str = "1-" + ctx.expression().getText() + " -> " + ctx.expression().getText();
+        System.out.println(str);
     }
 
     @Override
@@ -394,7 +472,6 @@ public class Listener implements japyListener {
 
     @Override
     public void enterExpression(japyParser.ExpressionContext ctx) {
-//        System.out.println(ctx.e.getText());
     }
 
     @Override
