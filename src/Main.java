@@ -22,7 +22,7 @@ public class Main {
         ParseTree tree = parser.program();
         ParseTreeWalker walker = new ParseTreeWalker();
         japyListener listener = new Listener();
-        japyListener hash_table = new Hash_table();
+        japyListener hash_table = new HashTable();
 //        System.out.println("Faze1");
 //        walker.walk(listener, tree);
         System.out.println("Faze2");

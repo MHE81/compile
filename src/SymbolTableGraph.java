@@ -6,7 +6,7 @@ public class SymbolTableGraph {
     private SymbolTable currentNode;
 
     public SymbolTableGraph() {
-        rootNode = new SymbolTable("program", null, 0);
+        rootNode = new SymbolTable("program", null, 0, 0);
         currentNode = rootNode;
     }
 
@@ -15,8 +15,8 @@ public class SymbolTableGraph {
         currentNode.symbolTable.put(key, entry);
     }
 
-    public void enterBlock(String name, int lineNumber) {
-        currentNode = currentNode.addChild(new SymbolTable(name, currentNode, lineNumber));
+    public void enterBlock(String name, int start_line,int stop_line) {
+        currentNode = currentNode.addChild(new SymbolTable(name, currentNode, start_line, stop_line));
     }
 
     public void exitBlock() {
