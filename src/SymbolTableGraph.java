@@ -1,3 +1,5 @@
+import gen.japyParser;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -5,8 +7,8 @@ public class SymbolTableGraph {
     private final SymbolTable rootNode;
     private SymbolTable currentNode;
 
-    public SymbolTableGraph() {
-        rootNode = new SymbolTable("program", null, 0, 0);
+    public SymbolTableGraph(japyParser.ProgramContext ctx) {
+        rootNode = new SymbolTable("program", null, ctx.getStart().getLine(),ctx.getStop().getLine() );
         currentNode = rootNode;
     }
 

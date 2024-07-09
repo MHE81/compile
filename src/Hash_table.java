@@ -194,29 +194,21 @@ public class Hash_table implements japyListener {
     public static String concatenateParameters(String methodDeclaration) {
         // Regular expression to match the parameter list in the method declaration
         String paramPattern = "\\(\\s*(.*?)\\s*\\)";
-
         // Compile the pattern
         Pattern pattern = Pattern.compile(paramPattern);
-
         // Match the pattern with the method declaration
         Matcher matcher = pattern.matcher(methodDeclaration);
-
         if (!matcher.find()) {
             return "";
         }
-
         String paramList = matcher.group(1);
-
         if (paramList.isEmpty()) {
             return "";
         }
-
         // Split the parameter list by comma
         String[] params = paramList.split(",");
-
         // Initialize an empty string for concatenation
         StringBuilder concatenatedParams = new StringBuilder("parameters: [");
-
         // Iterate over each parameter and concatenate it with its type
         for (int i = 0; i < params.length; i++) {
             String param = params[i];
@@ -227,10 +219,6 @@ public class Hash_table implements japyListener {
                 String paramType = paramParts[1].trim();
                 boolean isArray = paramType.endsWith("[]");
                 String typeStr = isArray ? "(" + paramType.replace("[]", "") + ", is_array)" : paramType;
-
-//                if (i > 0) {
-//                    concatenatedParams.append(", ");
-//                }
 
                 concatenatedParams.append("[(index: ")
                         .append(i)
@@ -245,7 +233,6 @@ public class Hash_table implements japyListener {
             }
         }
         concatenatedParams.append("]");
-
         // Return the concatenated string
         return concatenatedParams.toString();
     }

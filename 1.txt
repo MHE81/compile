@@ -7,6 +7,7 @@ class MyClass begin
         var c = love(10)
 	mel = 10+c
 	d++
+    c--
         return true
     end
 

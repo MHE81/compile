@@ -5,6 +5,8 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HashTable implements japyListener {
     private SymbolTableGraph stg;
@@ -26,7 +28,7 @@ public class HashTable implements japyListener {
     @Override
     public void enterProgram(japyParser.ProgramContext ctx) {
         System.out.println("\nprogram started");
-        this.stg = new SymbolTableGraph();
+        this.stg = new SymbolTableGraph(ctx);
     }
 
     @Override
@@ -34,46 +36,27 @@ public class HashTable implements japyListener {
         this.stg.printSymbolTable();
     }
 
-    private void classSymbolTableCreation (japyParser.ClassDeclarationContext ctx, String parent){
+    @Override
+    public void enterClassDeclaration(japyParser.ClassDeclarationContext ctx) {
+        String accessModifier = "public";
         // create symbol entry
         String className = ctx.className.getText();
         String classNameSymbol = "class_" + className;
         String key = "key = " + classNameSymbol;
-        String value = "Value = Class: (name: " + className + ") (extends: " + parent + ")";
-
+        String value = "Value = (name: " + className + ")"; // (extends: " + parent + ")";
+        if (ctx.access_modifier() != null){
+            accessModifier = ctx.access_modifier().getText();
+        }
+        value.concat("(accessModifier: " + accessModifier + ")");
+        if (ctx.classParent != null){
+            value.concat("(inherits: " + ctx.classParent.getText() + ")");
+        }
         int start_lineNumber = ctx.getStart().getLine();
         int stop_lineNumber = ctx.getStop().getLine();
         stg.addEntry(key, value);
-
         // symbol table creation
         stg.enterBlock(className, start_lineNumber, stop_lineNumber);
-    }
-    @Override
-    public void enterClassDeclaration(japyParser.ClassDeclarationContext ctx) {
-        String output = "class " + ctx.className.getText();
-        String parent;
-        int hasParent = 1;
-        if(ctx.classParent != null){
-            parent = ctx.classParent.getText();
-            output = output.concat(" extends " + ctx.classParent);
-            hasParent ++;
-            classSymbolTableCreation(ctx, parent);
-        }
-        else {
-            classSymbolTableCreation(ctx, null);
-        }
-//        String stringToConcat = "";
-//        if(ctx.getText().contains("implements")){
-//            for (int i = hasParent; i < ctx.Identifier().size(); i++) {
-//                if (i == ctx.Identifier().size() -1)
-//                    stringToConcat = stringToConcat.concat(ctx.Identifier(i).getText());
-//                else
-//                    stringToConcat = stringToConcat.concat(ctx.Identifier(i).getText() + ", ");
-//            }
-//            output = output.concat(" implements " + stringToConcat);
-//        }
         indent ++;
-//        System.out.println(output + " {\n");
     }
 
     @Override
@@ -87,8 +70,8 @@ public class HashTable implements japyListener {
     public void enterEntryClassDeclaration(japyParser.EntryClassDeclarationContext ctx) {
         indent++;
         // Symbol table entry
-        String key =  "Key = MainClass_" + ctx.classDeclaration().className.getText();
-        String value = "MainClass: (name: " + ctx.classDeclaration().className.getText() + ")";
+        String key =  "Key = class_" + ctx.classDeclaration().className.getText();
+        String value = "Value = (name: " + ctx.classDeclaration().className.getText() + ") (main)";
         stg.addEntry(key, value);
 
         // symbol table creation
@@ -106,29 +89,19 @@ public class HashTable implements japyListener {
 
     @Override
     public void enterFieldDeclaration(japyParser.FieldDeclarationContext ctx) {
-        // convert to java
-        String output = "";
-        if(ctx.access_modifier() != null){
-            output = output.concat(ctx.access_modifier().getText() + " ");
-        }
-        output = output.concat(changeType(ctx.fieldType.getText()) + " " + ctx.fieldName.getText() + " ");
-//        System.out.print(output);
-
-        // create symbol table entry
-        String key = "key = var_" + ctx.fieldName.getText();
-        String value = "Value = Field: (name: " + ctx.fieldName.getText() + ")";
-//        if(ctx.fieldType.Identifier() != null){
-//            value += "[ classType: " + ctx.type().Identifier().getText() + " ])";
-//        }
-//        else {
-//            value += ctx.type().javaType().getText() + ")";
-//        }
-        if(ctx.access_modifier() != null){
-            value += " (accessModifier: " + ctx.access_modifier().getText() + ")";
-        }
-        stg.addEntry(key, value);
+            for (int i = 0; i < ctx.ID().size(); i++) {
+                String accessModifier = "public";
+                // create symbol table entry
+                String key = "key = Field_" + ctx.ID(i).getText();
+                String value = "Value = (name: " + ctx.ID(i).getText() + ")";
+                if (ctx.access_modifier() != null) {
+                    accessModifier = ctx.access_modifier().getText();
+                }
+                value += "(accessModifier: " + accessModifier + ")";
+                value += "(Type: " + ctx.fieldType.getText() + ")";
+                stg.addEntry(key, value);
+            }
     }
-
     @Override
     public void exitFieldDeclaration(japyParser.FieldDeclarationContext ctx) {
 
@@ -143,72 +116,71 @@ public class HashTable implements japyListener {
     public void exitAccess_modifier(japyParser.Access_modifierContext ctx) {
 
     }
+    public static String concatenateParameters(String methodDeclaration) {
+        // Regular expression to match the parameter list in the method declaration
+        String paramPattern = "\\(\\s*(.*?)\\s*\\)";
+        // Compile the pattern
+        Pattern pattern = Pattern.compile(paramPattern);
+        // Match the pattern with the method declaration
+        Matcher matcher = pattern.matcher(methodDeclaration);
+        if (!matcher.find()) {
+            return "";
+        }
+        String paramList = matcher.group(1);
+        if (paramList.isEmpty()) {
+            return "";
+        }
+        // Split the parameter list by comma
+        String[] params = paramList.split(",");
+        // Initialize an empty string for concatenation
+        StringBuilder concatenatedParams = new StringBuilder("parameters: [");
+        // Iterate over each parameter and concatenate it with its type
+        for (int i = 0; i < params.length; i++) {
+            String param = params[i];
+            // Split each parameter by ':' to separate parameter name and type
+            String[] paramParts = param.trim().split(":");
+            if (paramParts.length == 2) {
+                String paramName = paramParts[0].trim();
+                String paramType = paramParts[1].trim();
+                boolean isArray = paramType.endsWith("[]");
+                String typeStr = isArray ? "(" + paramType.replace("[]", "") + ", is_array)" : paramType;
 
-    private void createMethodEntry(japyParser.MethodDeclarationContext ctx){
-        String accessModifier = "public";
-        if(ctx.access_modifier() != null)
-            accessModifier = ctx.access_modifier().getText();
-
-        String methodName = ctx.methodName.getText();
-//        miniJavaClassDetail.addMethod(stg.getCurentNodeName(), methodName , ctx.access_modifier().getText());
-        String key = "key = method_" + methodName;
-        StringBuilder value = new StringBuilder("Value = Method: (name: " + methodName + ")" + "(returnType: " + ctx.typeP1.getText()+ ") (accessModifier: ACCESS_MODIFIER_" + accessModifier);
-
-        if(ctx.param2 != null){
-            int i = 0;
-            int paramCount = ctx.ID().size();
-            value.append(" (parametersType: ");
-            for (;i < paramCount; i ++) {
-                if (ctx.ID(i) != null) {
-                    value.append("[").append(ctx.ID(i).getText()).append(", ").append("index: ").append(i + 1).append("]");
+                concatenatedParams.append("[(index: ")
+                        .append(i)
+                        .append("), (name: ")
+                        .append(paramName)
+                        .append("), (type: ")
+                        .append(typeStr)
+                        .append(")]");
+                if ((params.length - 1) > i) {
+                    concatenatedParams.append(",\n");
                 }
-//                else {
-//                    value.append("[ classType = ").append(ctx.ID(i).Identifier().getText()).append(", ").append("index: ").append(i + 1).append("]");
-//                }
             }
         }
-        value.append(")");
-        stg.addEntry(key, value.toString());
-        stg.enterBlock(methodName, ctx.getStart().getLine(), ctx.getStop().getLine());
+        concatenatedParams.append("]");
+        // Return the concatenated string
+        return concatenatedParams.toString();
     }
     @Override
     public void enterMethodDeclaration(japyParser.MethodDeclarationContext ctx) {
-        String output = "\t";
-        if (ctx.access_modifier() != null) {
-            output = output.concat(ctx.access_modifier().getText() + " ");
-        }
-        if (ctx.t != null) {
-            output = output.concat(changeType(ctx.t.getText()) + " ");
-        }
-
-        output = output.concat(ctx.methodName.getText() + " (");
-        if (ctx.param1 != null){
-            for (int i = 0; i < ctx.ID().size(); i++) {
-                if(!(i == ctx.ID().size() - 1)) {
-                    output = output.concat(ctx.ID().get(i).getText() + " " + ctx.ID().get(i) + ", ");
-                }
-                else {
-                    output = output.concat(ctx.ID().get(i).getText() + " " + ctx.ID().get(i) + " ) {\n");
-                }
-            }
-        }else {
-            output = output.concat(") {\n");
-
-        }
-//        System.out.println(output);
         indent ++;
-
         // create symbol table entry and symbol table
-        createMethodEntry(ctx);
+        String accessModifier = "public";
+        if(ctx.access_modifier() != null) {
+            accessModifier = ctx.access_modifier().getText();
+        }
+        String methodName = ctx.methodName.getText();
+//        miniJavaClassDetail.addMethod(stg.getCurentNodeName(), methodName , ctx.access_modifier().getText());
+        String key = "Key = Function_" + methodName;
+        String value = new String("Value = (name: " + methodName + ")" + "(AccessModifier: " + accessModifier + ")(Return: " + ctx.t.getText() + ")");
+        value += "\n" + concatenateParameters(ctx.getText());
+        stg.addEntry(key, value);
+        stg.enterBlock(methodName, ctx.getStart().getLine(), ctx.getStop().getLine());
     }
 
     @Override
     public void exitMethodDeclaration(japyParser.MethodDeclarationContext ctx) {
         indent --;
-//        if (ctx.methodBody().RETURN() != null)
-//            System.out.println("\t\treturn " + expressionHandler(ctx.methodBody().expression()) + ";");
-//        System.out.print("\t}\n");
-
         stg.exitBlock();
     }
 
@@ -221,25 +193,147 @@ public class HashTable implements japyListener {
     public void exitClosedStatement(japyParser.ClosedStatementContext ctx) {
 
     }
-
+    public void enterClosedonditional_if(japyParser.ClosedConditionalContext ctx) {
+        stg.enterBlock("If", ctx.getStart().getLine(), ctx.getStop().getLine());
+    }
+    public void enterClosedConditional_elif(japyParser.ClosedConditionalContext ctx) {
+        for (int i = 0; i < ctx.expression().size()-1; i++) {
+            stg.enterBlock("Elif", ctx.getStart().getLine(), ctx.getStop().getLine());
+        }
+    }
+    public void enterClosedConditional_else(japyParser.ClosedConditionalContext ctx) {
+        stg.enterBlock("Else", ctx.getStart().getLine(), ctx.getStop().getLine());
+    }
     @Override
     public void enterClosedConditional(japyParser.ClosedConditionalContext ctx) {
-
+        enterClosedonditional_if(ctx);
+        if (ctx.elifExp != null) {
+            enterClosedConditional_elif(ctx);
+        }
+        enterClosedConditional_else(ctx);
     }
-
+    public void exitClosedConditional_if(japyParser.ClosedConditionalContext ctx) {
+        stg.exitBlock();
+    }
+    public void exitClosedConditional_elif(japyParser.ClosedConditionalContext ctx) {
+        for (int i = 0; i < ctx.expression().size()-1; i++) {
+            stg.exitBlock();
+        }
+    }
+    public void exitClosedConditional_else(japyParser.ClosedConditionalContext ctx) {
+        stg.exitBlock();
+    }
     @Override
     public void exitClosedConditional(japyParser.ClosedConditionalContext ctx) {
-
+        exitClosedConditional_if(ctx);
+        if (ctx.elifExp != null) {
+            exitClosedConditional_elif(ctx);
+        }
+//        exitClosedConditional_elif(ctx);
+        exitClosedConditional_else(ctx);
     }
 
+    public void enterOpenConditional_if1(japyParser.OpenConditionalContext ctx) {
+        stg.enterBlock("If", ctx.ifStat.getStart().getLine(), ctx.getStop().getLine());
+    }
+    public void enterOpenConditional_if2(japyParser.OpenConditionalContext ctx) {
+        stg.enterBlock("If", ctx.secondIfStat.getStart().getLine(), ctx.getStop().getLine());
+    }
+    public void enterOpenConditional_if3(japyParser.OpenConditionalContext ctx) {
+        stg.enterBlock("If", ctx.thirdIfStat.getStart().getLine(), ctx.getStop().getLine());
+    }
+    public void enterOpenConditional_if_elif(japyParser.OpenConditionalContext ctx) {
+        stg.enterBlock("Elif", ctx.elifStat.getStart().getLine(), ctx.getStop().getLine());
+    }
+    public void enterOpenConditional_lastElif(japyParser.OpenConditionalContext ctx) {
+        stg.enterBlock("If", ctx.lastElifStmt.getStart().getLine(), ctx.getStop().getLine());
+    }
+    public void enterOpenConditional_else(japyParser.OpenConditionalContext ctx) {
+        stg.enterBlock("Else", ctx.elseStmt.getStart().getLine(), ctx.getStop().getLine());
+    }
     @Override
     public void enterOpenConditional(japyParser.OpenConditionalContext ctx) {
-
+//        if (ctx.ifStat != null) {
+//            enterOpenConditional_if1(ctx);
+//        }
+//        if (ctx.elifExp != null) {
+//            enterOpenConditional_if2(ctx);
+//            for (int i = 0; i <ctx.closedStatement().size()-1; i++) {
+////                enterOpenConditional_if_elif(ctx);
+//
+//                for (int j = 0; j < ctx.expression().size(); j++) {
+////                    Token startToken = ctx.elifStat(i).getStart();
+////                    int line = startToken.getLine();
+//                    String elifExpression = ctx.expression(i+1).getText();
+//                    String elifStatement = ctx.closedStatement(i-1).getText();
+//                    String str = "(expression: " + elifExpression + ") (statement: " + elifStatement + ")";
+//                    System.out.println(str);
+////                    elif_table.put("elif_" + i, str);
+//                }
+//
+//            }
+//        }
+//        enterOpenConditional_lastElif(ctx);
+//        if (ctx.elseStmt != null) {
+//            enterOpenConditional_if3(ctx);
+//            for (int i = 0; i <ctx.closedStatement().size()-1; i++) {
+////                enterOpenConditional_if_elif(ctx);
+//                for (int j = 0; j < ctx.expression().size(); j++) {
+////                    Token startToken = ctx.elifStat(i).getStart();
+////                    int line = startToken.getLine();
+//                    String elifExpression = ctx.expression(i+1).getText();
+//                    String elifStatement = ctx.closedStatement(i-1).getText();
+//                    String str = "(expression: " + elifExpression + ") (statement: " + elifStatement + ")";
+//                    System.out.println(str);
+////                    elif_table.put("elif_" + i, str);
+//                }
+//            }
+//            enterOpenConditional_else(ctx);
+//        }
     }
-
+    public void exitOpenConditional_if1(japyParser.OpenConditionalContext ctx) {
+        stg.exitBlock();
+    }
+    public void exitOpenConditional_if2(japyParser.OpenConditionalContext ctx) {
+        stg.exitBlock();
+    }
+    public void exitOpenConditional_if3(japyParser.OpenConditionalContext ctx) {
+        stg.exitBlock();
+    }
+    public void exitOpenConditional_if_elif(japyParser.OpenConditionalContext ctx) {
+        stg.exitBlock();
+    }
+    public void exitOpenConditional_else(japyParser.OpenConditionalContext ctx) {
+        stg.exitBlock();
+    }
+    public void exitOpenConditional_lastElif(japyParser.OpenConditionalContext ctx) {
+        stg.exitBlock();
+    }
     @Override
     public void exitOpenConditional(japyParser.OpenConditionalContext ctx) {
-
+//        if (ctx.ifStat != null) {
+//            exitOpenConditional_if1(ctx);
+//        }
+//        if (ctx.elifExp != null) {
+//            exitOpenConditional_if2(ctx);
+//        }
+//        exitOpenConditional_lastElif(ctx);
+//        if (ctx.elseStmt != null) {
+//            exitOpenConditional_if3(ctx);
+//            for (int i = 0; i <ctx.closedStatement().size()-1; i++) {
+//            exitOpenConditional_if_elif(ctx);
+////                for (int j = 0; j < ctx.expression().size(); j++) {
+//////                    Token startToken = ctx.elifStat(i).getStart();
+//////                    int line = startToken.getLine();
+////                    String elifExpression = ctx.expression(i+1).getText();
+////                    String elifStatement = ctx.closedStatement(i-1).getText();
+////                    String str = "(expression: " + elifExpression + ") (statement: " + elifStatement + ")";
+////                    System.out.println(str);
+//////                    elif_table.put("elif_" + i, str);
+//                }
+////            }
+//        }
+//        exitOpenConditional_else(ctx);
     }
 
     @Override
@@ -264,7 +358,12 @@ public class HashTable implements japyListener {
 
     @Override
     public void enterStatementVarDef(japyParser.StatementVarDefContext ctx) {
-
+        for (int i = 0; i < ctx.ID().size(); i++) {
+            // create symbol table entry
+            String key = "key = Var_" + ctx.ID(i).getText();
+            String value = "Value = (name: " + ctx.ID(i).getText() + ")(first appearance: " + ctx.start.getLine();
+            stg.addEntry(key, value);
+        }
     }
 
     @Override
@@ -325,7 +424,7 @@ public class HashTable implements japyListener {
 
     @Override
     public void enterStatementOpenLoop(japyParser.StatementOpenLoopContext ctx) {
-
+        stg.enterBlock("while", ctx.getStart().getLine(), ctx.getStop().getLine());
     }
 
     @Override
@@ -345,7 +444,10 @@ public class HashTable implements japyListener {
 
     @Override
     public void enterStatementAssignment(japyParser.StatementAssignmentContext ctx) {
-
+        // create symbol table entry
+        String key = "key = Assign_" + ctx.left.getText();
+        String value = "Value = (name: " + ctx.right.getText() + ")(first appearance: " + ctx.start.getLine() + ")";
+        stg.addEntry(key, value);
     }
 
     @Override
@@ -355,9 +457,11 @@ public class HashTable implements japyListener {
 
     @Override
     public void enterStatementInc(japyParser.StatementIncContext ctx) {
-
+        // create symbol table entry
+        String key = "key = Inc_" + ctx.lvalExpr.getText();
+        String value = "Value = (name: " + ctx.lvalExpr.getText() + ")(first appearance: " + ctx.start.getLine() + ")";
+        stg.addEntry(key, value);
     }
-
     @Override
     public void exitStatementInc(japyParser.StatementIncContext ctx) {
 
@@ -365,7 +469,10 @@ public class HashTable implements japyListener {
 
     @Override
     public void enterStatementDec(japyParser.StatementDecContext ctx) {
-
+        // create symbol table entry
+        String key = "key = Dec_" + ctx.lvalExpr.getText();
+        String value = "Value = (name: " + ctx.lvalExpr.getText() + ")(first appearance: " + ctx.start.getLine() + ")";
+        stg.addEntry(key, value);
     }
 
     @Override

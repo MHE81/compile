@@ -12,7 +12,7 @@ class SymbolTableEntry{
     }
 
     public void print(){
-        System.out.print(key + "\t|\t");
+        System.out.print(key + ", ");
         System.out.println(value);
     }
 }
