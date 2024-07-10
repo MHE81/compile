@@ -10,8 +10,6 @@ import java.util.regex.Pattern;
 
 public class HashTable implements japyListener {
     private SymbolTableGraph stg;
-    private boolean nestedBlockForStatement = false;
-    private final Stack<Boolean> nestedBlockStack = new Stack<>();
     private static int indent = 0;
 
     private String changeType(String type){
@@ -253,43 +251,38 @@ public class HashTable implements japyListener {
     }
     @Override
     public void enterOpenConditional(japyParser.OpenConditionalContext ctx) {
-//        if (ctx.ifStat != null) {
-//            enterOpenConditional_if1(ctx);
-//        }
-//        if (ctx.elifExp != null) {
-//            enterOpenConditional_if2(ctx);
-//            for (int i = 0; i <ctx.closedStatement().size()-1; i++) {
-////                enterOpenConditional_if_elif(ctx);
-//
-//                for (int j = 0; j < ctx.expression().size(); j++) {
-////                    Token startToken = ctx.elifStat(i).getStart();
-////                    int line = startToken.getLine();
-//                    String elifExpression = ctx.expression(i+1).getText();
-//                    String elifStatement = ctx.closedStatement(i-1).getText();
-//                    String str = "(expression: " + elifExpression + ") (statement: " + elifStatement + ")";
-//                    System.out.println(str);
-////                    elif_table.put("elif_" + i, str);
-//                }
-//
-//            }
-//        }
-//        enterOpenConditional_lastElif(ctx);
-//        if (ctx.elseStmt != null) {
-//            enterOpenConditional_if3(ctx);
-//            for (int i = 0; i <ctx.closedStatement().size()-1; i++) {
-////                enterOpenConditional_if_elif(ctx);
-//                for (int j = 0; j < ctx.expression().size(); j++) {
-////                    Token startToken = ctx.elifStat(i).getStart();
-////                    int line = startToken.getLine();
-//                    String elifExpression = ctx.expression(i+1).getText();
-//                    String elifStatement = ctx.closedStatement(i-1).getText();
-//                    String str = "(expression: " + elifExpression + ") (statement: " + elifStatement + ")";
-//                    System.out.println(str);
-////                    elif_table.put("elif_" + i, str);
-//                }
-//            }
-//            enterOpenConditional_else(ctx);
-//        }
+        if (ctx.ifStat != null) {
+            enterOpenConditional_if1(ctx);
+        }
+        if (ctx.secondIfStat != null && ctx.lastElifStmt != null) {
+            enterOpenConditional_if2(ctx);
+            if (ctx.elifStat != null) {
+                for (int i = 0; i < ctx.closedStatement().size() - 1; i++) {
+//                enterOpenConditional_if_elif(ctx);
+
+                    for (int j = 0; j < ctx.expression().size(); j++) {
+//                    Token startToken = ctx.elifStat(i).getStart();
+//                    int line = startToken.getLine();
+                        String elifExpression = ctx.expression(i + 1).getText();
+                        String elifStatement = ctx.closedStatement(i - 1).getText();
+                        String str = "(expression: " + elifExpression + ") (statement: " + elifStatement + ")";
+                        System.out.println(str);
+//                    elif_table.put("elif_" + i, str);
+                    }
+                }
+                enterOpenConditional_lastElif(ctx);
+            }
+
+        }
+        if (ctx.thirdIfStat != null && ctx.elseStmt != null) {
+            enterOpenConditional_if3(ctx);
+            if (ctx.elifStat != null) {
+                for (int i = 0; i <ctx.closedStatement().size()-1; i++) {
+                enterOpenConditional_if_elif(ctx);
+                }
+            }
+            enterOpenConditional_else(ctx);
+        }
     }
     public void exitOpenConditional_if1(japyParser.OpenConditionalContext ctx) {
         stg.exitBlock();
@@ -311,29 +304,28 @@ public class HashTable implements japyListener {
     }
     @Override
     public void exitOpenConditional(japyParser.OpenConditionalContext ctx) {
-//        if (ctx.ifStat != null) {
-//            exitOpenConditional_if1(ctx);
-//        }
-//        if (ctx.elifExp != null) {
-//            exitOpenConditional_if2(ctx);
-//        }
-//        exitOpenConditional_lastElif(ctx);
-//        if (ctx.elseStmt != null) {
-//            exitOpenConditional_if3(ctx);
-//            for (int i = 0; i <ctx.closedStatement().size()-1; i++) {
-//            exitOpenConditional_if_elif(ctx);
-////                for (int j = 0; j < ctx.expression().size(); j++) {
-//////                    Token startToken = ctx.elifStat(i).getStart();
-//////                    int line = startToken.getLine();
-////                    String elifExpression = ctx.expression(i+1).getText();
-////                    String elifStatement = ctx.closedStatement(i-1).getText();
-////                    String str = "(expression: " + elifExpression + ") (statement: " + elifStatement + ")";
-////                    System.out.println(str);
-//////                    elif_table.put("elif_" + i, str);
-//                }
-////            }
-//        }
-//        exitOpenConditional_else(ctx);
+        if (ctx.ifStat != null) {
+            exitOpenConditional_if1(ctx);
+        }
+        if (ctx.secondIfStat != null && ctx.lastElifStmt != null) {
+            exitOpenConditional_if2(ctx);
+            if (ctx.elifStat != null) {
+                for (int i = 0; i < ctx.closedStatement().size() - 1; i++) {
+                exitOpenConditional_if_elif(ctx);
+                }
+                exitOpenConditional_lastElif(ctx);
+            }
+
+        }
+        if (ctx.thirdIfStat != null && ctx.elseStmt != null) {
+            exitOpenConditional_if3(ctx);
+            if (ctx.elifStat != null) {
+                for (int i = 0; i <ctx.closedStatement().size()-1; i++) {
+                exitOpenConditional_if_elif(ctx);
+                }
+            }
+            exitOpenConditional_else(ctx);
+        }
     }
 
     @Override

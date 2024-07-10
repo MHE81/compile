@@ -5,9 +5,11 @@ class MyClass begin
     func myMethod(param1: int, param2: double, param3: string) returns bool begin
         var a = 10, b = 20.5, d=75
         var c = love(10)
-	mel = 10+c
-	d++
-    c--
+        if(n<2)
+            s++
+	    mel = 10+c
+	    d++
+        c--
         return true
     end
 
