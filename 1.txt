@@ -52,6 +52,8 @@ public class MElika inherits Fateme begin
         var a = 10, b = 20.5
         var c = a + b
 	while(c == true) begin
+        while(f==10)
+            f++
         c++
 		continue
         end

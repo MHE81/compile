@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,6 +13,25 @@ public class HashTable implements japyListener {
     private SymbolTableGraph stg;
     private static int indent = 0;
 
+    private static String errorMessages = null;
+    private DirectedGraph graph = new DirectedGraph();
+    private void detectAllErrorsInCode(){
+        invalidInheritance();
+        if (errorMessages != null)
+            System.err.println(errorMessages);
+    }
+    private void invalidInheritance(){
+        List<String> cycle = graph.findAllCycleNodes();
+        if (cycle.size() > 0) {
+            String errorMessage = "Error410 : Invalid inheritance ";
+            for(int i = 0 ; i < cycle.size() ; i++){
+                errorMessage += cycle.get(i);
+                if (i < cycle.size() - 1)
+                    errorMessage += " -> ";
+            }
+            System.err.println(errorMessage);
+        }
+    }
     private String changeType(String type){
         String str = type;
         if (str != null) str = (str.contains("number")) ? str.replace("number", "int") : str;
@@ -174,6 +194,7 @@ public class HashTable implements japyListener {
         value += "\n" + concatenateParameters(ctx.getText());
         stg.addEntry(key, value);
         stg.enterBlock(methodName, ctx.getStart().getLine(), ctx.getStop().getLine());
+        Details.addMethod(stg.getCurentNodeName(), ctx.methodName.getText(), accessModifier);
     }
 
     @Override
