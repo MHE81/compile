@@ -25,7 +25,7 @@ public class Main {
         japyListener hash_table = new HashTable();
 //        System.out.println("Faze1");
 //        walker.walk(listener, tree);
-        System.out.println("Faze2");
+        System.out.println("Faze2 & 3");
         System.out.print("---------------1.txt-------------------");
         walker.walk(hash_table,tree);
     }

@@ -3,6 +3,34 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+class MethodEntry extends SymbolTableEntry {
+    public String returnType;
+    public MethodEntry(String key, String value, String returnType) {
+        super(key, value);
+        this.returnType = returnType;
+    }
+    @Override
+    public void print() {
+        super.print();
+        System.out.println("Return Type: " + returnType);
+    }
+}
+
+
+class VariableEntry extends SymbolTableEntry {
+    public String type;
+
+    public VariableEntry(String key, String value, String type) {
+        super(key, value);
+        this.type = type;
+    }
+    @Override
+    public void print() {
+        super.print();
+        System.out.println("Type: " + type);
+    }
+}
+
 class SymbolTableEntry{
     public String key;
     public String value;
@@ -40,6 +68,23 @@ public class SymbolTable {
         this.children = new ArrayList<>();
     }
 
+    public String getType(String variableName) {
+        SymbolTable current = this;
+        while (current != null) {
+            for (Map.Entry<String, SymbolTableEntry> entry : current.symbolTable.entrySet()) {
+                if (entry.getKey().equals("Field_" + variableName)) {
+                    String value = entry.getValue().value;
+                    int typeStartIndex = value.indexOf("(Type: ") + "(Type: ".length();
+                    int typeEndIndex = value.indexOf(")", typeStartIndex);
+                    if (typeStartIndex != -1 && typeEndIndex != -1) {
+                        return value.substring(typeStartIndex, typeEndIndex);
+                    }
+                }
+            }
+            current = current.getParent();
+        }
+        return null;
+    }
     public void print(){
         System.out.println("-------------- " + this.name + ": (" + this.start_line + "," + this.stop_line +  ")--------------");
         if (!this.symbolTable.isEmpty()){

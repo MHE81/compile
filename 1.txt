@@ -1,8 +1,14 @@
-class MyClass begin
-    public field int x, y, v
+class MyClass inherits MElika begin
+    public field double x, y, v
     private field double z
+    field string s
+    func x(param1: double)returns double begin
+        param1++
+        s = param1
+        return x
+    end
 
-    func myMethod(param1: int, param2: double, param3: string) returns bool begin
+    func myMethod(param1: double, param2: double, param3: string) returns bool begin
         var a = 10, b = 20.5, d=75
         var c = love(10)
         if(n<2)
@@ -10,6 +16,10 @@ class MyClass begin
 	    mel = 10+c
 	    d++
         c--
+        return true
+    end
+    func myMethod(param1: double, param2: double, param3: string) returns bool begin
+        sout("loveyou")
         return true
     end
 
@@ -36,7 +46,7 @@ class MyClass begin
 		c++
         m++
         end
-        return "Done" || true
+        return "Done"
     end
 end
 
@@ -45,7 +55,7 @@ MAIN class Amir begin
 end
 
 public class MElika inherits Fateme begin
-    public field int x, y
+    public field double x, y
     private field double z
 
     func myMethod(param1: int, param2: double) returns bool begin
@@ -71,16 +81,16 @@ public class MElika inherits Fateme begin
     end
 end
 
-class Fateme begin
-    public field int x, y
+public class Fateme inherits MyClass begin
+    public field double x, y
     private field double z
 
-    func myMethod(param1: int, param2: double) returns bool begin
+    func myMethod(param1: double, param2: double) returns bool begin
         var a = 10, b = 20.5
         return true
     end
 
-    func anotherMethod(init: int) returns string begin
+    func anotherMethod(init: double) returns string begin
         sout("Hello, world!")
         return "Done"
     end
