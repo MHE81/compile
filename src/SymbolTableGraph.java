@@ -37,7 +37,7 @@ public class SymbolTableGraph {
             return "bool"; // assuming || returns a bool
         } else if (ctx.e.a.at != null) {
             return "bool"; // assuming && returns a bool
-        } else if (ctx.e.a.e !=null) {
+        } else if (ctx.e.a.e.et !=null) {
             return "bool"; // assuming == and <> return a bool
         } else if (ctx.e.a.e.c.ct != null) {
             return "bool"; // assuming < and > return a bool
@@ -47,7 +47,7 @@ public class SymbolTableGraph {
         } else if (ctx.e.a.e.c.a.m.mt != null) {
             // assuming *, /, and % return the type of their operands
             return "double";
-        } else if (ctx.e.a.e.c.a.m.u != null) {
+        } else if (ctx.e.a.e.c.a.m.u.u != null) {
             // assuming ! returns bool, - returns the type of its operand
             return "bool";
         } else if (ctx.e.a.e.c.a.m.u.m.mt != null) {

@@ -518,18 +518,61 @@ public class HashTable implements japyListener {
 //            // Or handle the error as per your application's requirements
 //        }
 
-        // Finding the type of variable 'x'
-        String typeOfX = stg.getTypeOfVariable(ctx.left.getText());
-        String typeOfY = stg.getTypeOfVariable(ctx.right.getText());
-        if (typeOfX != null && typeOfY != null) {
-            if (!typeOfX.equals(typeOfY)) {
-                System.out.println("Error105 : in line [" + ctx.start.getLine() + ":" + ctx.left.getStart().getCharPositionInLine()+ "] Type mismatch error: Left expression type \""+ typeOfX + "\" does not match right expression type \"" + typeOfY +"\"");
+
+        String returnn1 = stg.evaluateExpressionType(ctx.left);
+        String returnn2 = stg.evaluateExpressionType(ctx.left);
+        if (ctx.left.getText().contains("\"")) {
+            returnn1 = "string";
+        }
+        // Regular expression to match any alphabetic character
+        Pattern pattern = Pattern.compile("^[a-zA-Z]+$");
+        Matcher matcher = pattern.matcher(ctx.left.getText());
+
+        // Check if the string contains any alphabetic character
+        boolean hasAlphabet = matcher.find();
+        if (hasAlphabet && !ctx.left.getText().contains("true") && !ctx.left.getText().contains("false")){
+            returnn1 = stg.getTypeOfVariable(ctx.left.getText());
+        }
+
+        if (ctx.left.getText().contains("\"")) {
+            returnn2 = "string";
+        }
+        // Regular expression to match any alphabetic character
+        Pattern pattern1 = Pattern.compile("^[a-zA-Z]+$");
+        Matcher matcher1 = pattern1.matcher(ctx.right.getText());
+
+        // Check if the string contains any alphabetic character
+        boolean hasAlphabet1 = matcher1.find();
+        if (hasAlphabet1 && !ctx.right.getText().contains("true") && !ctx.right.getText().contains("false")){
+            returnn2 = stg.getTypeOfVariable(ctx.right.getText());
+        }
+//        System.out.println(returnn1);
+//        System.out.println(returnn2);
+        if (returnn1 != null && returnn2 != null) {
+            if (!returnn1.equals(returnn2)) {
+                System.out.println("Error105 : in line [" + ctx.start.getLine() + ":" + ctx.left.getStart().getCharPositionInLine()+ "] Type mismatch error: Left expression type \""+ returnn1 + "\" does not match right expression type \"" + returnn2 +"\"");
             }
-        } else if (typeOfX == null) {
+        } else if (returnn2 == null) {
             System.out.println("Error106: in line [" + ctx.start.getLine() + ":_] Variable \"" + ctx.left.getText() + "\" not found or type information not available.");
-        }else if (typeOfY == null) {
+        } else if (returnn1 == null) {
             System.out.println("Error106: in line [" + ctx.start.getLine() + ":_] Variable \"" + ctx.right.getText() + "\" not found or type information not available.");
         }
+
+
+        // Finding the type of variable 'x'
+//        String typeOfX = stg.getTypeOfVariable(ctx.left.getText());
+//        String typeOfY = stg.getTypeOfVariable(ctx.right.getText());
+//        System.out.println(typeOfX);
+//        System.out.println(typeOfY);
+//        if (typeOfX != null && typeOfY != null) {
+//            if (!typeOfX.equals(typeOfY)) {
+//                System.out.println("Error105 : in line [" + ctx.start.getLine() + ":" + ctx.left.getStart().getCharPositionInLine()+ "] Type mismatch error: Left expression type \""+ typeOfX + "\" does not match right expression type \"" + typeOfY +"\"");
+//            }
+//        } else if (typeOfX == null) {
+//            System.out.println("Error106: in line [" + ctx.start.getLine() + ":_] Variable \"" + ctx.left.getText() + "\" not found or type information not available.");
+//        } else if (typeOfY == null) {
+//            System.out.println("Error106: in line [" + ctx.start.getLine() + ":_] Variable \"" + ctx.right.getText() + "\" not found or type information not available.");
+//        }
 
     }
 

@@ -1,18 +1,22 @@
 class MyClass inherits MElika begin
     public field double x, y, v
     private field double z
-    field string s
+    public field bool s
+    public field string v
+    func x(param1: string)returns double begin
+        param1++
+        param1 = z
+        x = y
+        return x
+    end
+
     func myMethod(param1: double, param2: double, param3: string) returns bool begin
         var a = 10, b = 20.5, d=75
         var c = love(10)
         if(n<2)
-            x = 10
-        else
-            m++
-        
+            s++
 	    mel = 10+c
 	    d++
-        param1 = s
         c--
         return true
     end
@@ -23,16 +27,27 @@ class MyClass inherits MElika begin
 
     func anotherMethod(init: string) returns string begin
         sout("Hello, world!")
-	    if (x<5 && b==3)
-            s++
-	    elif (c==9)
-		    v++
-	    elif (c>d)
-		    d++
-        elif (b==10)
-            d++
-	    else
-            m++
+	if (x<5 && b==3) begin
+            if(c==9)begin
+                v++
+                while(c==8)
+                    x++
+            end
+            elif(s==10)
+                a++
+		c++
+        sout("hiiiiiii")
+    end
+	elif (c==9)
+		v++
+	elif (c>d)
+		d++
+    elif (b==10)
+        d++
+	else begin
+		c++
+        m++
+        end
         return "Done"
     end
 end
@@ -42,14 +57,16 @@ MAIN class Amir begin
 end
 
 public class MElika inherits Fateme begin
-    private field double x, y
+    public field double x, y
     private field double z
+
     func myMethod(param1: int, param2: double) returns bool begin
         var a = 10, b = 20.5
         var c = a + b
 	while(c == true) begin
         while(f==10)
-            c++
+            f++
+        c++
 		continue
         end
         return true
