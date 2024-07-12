@@ -14,16 +14,14 @@ public class SymbolTableGraph {
         return containsNameInNode(rootNode, name);
     }
     public boolean containsNameInNode(SymbolTable node, String name) {
-        String str = "Field_" + name;
-        boolean is_repeated  = node.symbolTable.containsKey(str);
-        if (is_repeated) {
+        if (node.symbolTable.containsKey("Key = Field_" + name)) {
 //            if (!(node.symbolTable.containsKey("Field")) && node.symbolTable.containsKey("Function")) {
 //                return true;
 //            } else if (node.symbolTable.containsKey("Field") && !(node.symbolTable.containsKey("Function"))) {
             return true;
 //            }
         }
-        else if (node.symbolTable.containsKey("Function_" + name)) {
+        else if (node.symbolTable.containsKey("Key = Function_" + name)) {
             return true;
         }
         for (SymbolTable child : node.getChildren()) {

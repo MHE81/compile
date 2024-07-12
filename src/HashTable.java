@@ -118,7 +118,7 @@ public class HashTable implements japyListener {
         for (int i = 0; i < ctx.ID().size(); i++) {
             String accessModifier = "public";
             // create symbol table entry
-            key = "key = Field_" + ctx.ID(i).getText();
+            key = "Key = Field_" + ctx.ID(i).getText();
             value = "Value = (name: " + ctx.ID(i).getText() + ")";
             if (ctx.access_modifier() != null) {
                 accessModifier = ctx.access_modifier().getText();
