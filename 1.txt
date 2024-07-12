@@ -2,11 +2,6 @@ class MyClass inherits MElika begin
     public field double x, y, v
     private field double z
     field string s
-    func x(param1: double)returns double begin
-        param1++
-        s = param1
-        return x
-    end
 
     func myMethod(param1: double, param2: double, param3: string) returns bool begin
         var a = 10, b = 20.5, d=75
@@ -55,7 +50,7 @@ MAIN class Amir begin
 end
 
 public class MElika inherits Fateme begin
-    public field double x, y
+    private field double x, y
     private field double z
 
     func myMethod(param1: int, param2: double) returns bool begin

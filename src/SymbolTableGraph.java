@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SymbolTableGraph {
-    private final SymbolTable rootNode;
-    private SymbolTable currentNode;
+    public final SymbolTable rootNode;
+    public SymbolTable currentNode;
 
     public String getTypeOfVariable(String variableName) {
         return currentNode.getType(variableName);
@@ -61,7 +61,11 @@ public class SymbolTableGraph {
                 return "string"; // assuming strings are of type string
             } else if (otherCtx.ID() != null) {
                 String variableName = otherCtx.ID().getText();
-                SymbolTableEntry entry = lookup(variableName);
+                if (ctx.parent instanceof japyParser.StatementReturnContext) {
+                    String result = getTypeOfVariable(((japyParser.StatementReturnContext) ctx.parent).e.getText());
+                    return result;
+                }
+//                SymbolTableEntry entry = lookup(variableName);
 //                if (entry instanceof VariableEntry) {
 //                    return ((VariableEntry) entry).type;
 //                } else {

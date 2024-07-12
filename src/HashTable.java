@@ -15,10 +15,10 @@ public class HashTable implements japyListener {
 //    List<japyParser.ExpressionContext> returnStatements = new ArrayList<>();
     private static String errorMessages = null;
     private DirectedGraph graph = new DirectedGraph();
-    private void detectAllErrorsInCode(){
+    private void InheritErrorsInCode(){
         invalidInheritance();
-        if (errorMessages != null)
-            System.err.println(errorMessages);
+//        if (errorMessages != null)
+//            System.err.println(errorMessages);
     }
     private void invalidInheritance(){
         List<String> cycle = graph.findAllCycleNodes();
@@ -32,16 +32,16 @@ public class HashTable implements japyListener {
             System.err.println(errorMessage);
         }
     }
-    private String changeType(String type){
-        String str = type;
-        if (str != null) str = (str.contains("number")) ? str.replace("number", "int") : str;
-        return str;
-    }
-
-    private void printTab(int tabCount){
-        for (int i=0; i<tabCount; i++)
-            System.out.print("\t");
-    }
+//    private String changeType(String type){
+//        String str = type;
+//        if (str != null) str = (str.contains("number")) ? str.replace("number", "int") : str;
+//        return str;
+//    }
+//
+//    private void printTab(int tabCount){
+//        for (int i=0; i<tabCount; i++)
+//            System.out.print("\t");
+//    }
 
     @Override
     public void enterProgram(japyParser.ProgramContext ctx) {
@@ -52,7 +52,7 @@ public class HashTable implements japyListener {
     @Override
     public void exitProgram(japyParser.ProgramContext ctx) {
         this.stg.printSymbolTable();
-        detectAllErrorsInCode();
+        InheritErrorsInCode();
     }
 
     @Override
@@ -111,22 +111,25 @@ public class HashTable implements japyListener {
 
     @Override
     public void enterFieldDeclaration(japyParser.FieldDeclarationContext ctx) {
-            for (int i = 0; i < ctx.ID().size(); i++) {
-                String accessModifier = "public";
-                // create symbol table entry
-                String key = "key = Field_" + ctx.ID(i).getText();
-                String value = "Value = (name: " + ctx.ID(i).getText() + ")";
-                if (ctx.access_modifier() != null) {
-                    accessModifier = ctx.access_modifier().getText();
-                }
-                value += "(accessModifier: " + accessModifier + ")";
-                value += "(Type: " + ctx.fieldType.getText() + ")";
-                stg.addEntry(key, value);
+        String key = "";
+        String value = "";
+        for (int i = 0; i < ctx.ID().size(); i++) {
+            String accessModifier = "public";
+            // create symbol table entry
+            key = "key = Field_" + ctx.ID(i).getText();
+            value = "Value = (name: " + ctx.ID(i).getText() + ")";
+            if (ctx.access_modifier() != null) {
+                accessModifier = ctx.access_modifier().getText();
             }
+            value += "(accessModifier: " + accessModifier + ")";
+            value += "(Type: " + ctx.fieldType.getText() + ")";
+            stg.addEntry(key, value);
+        }
         boolean repeated = stg.containsNameInGraph(ctx.fieldName.getText());
-        if (!repeated){
+        if (!repeated) {
             String errorMessage = "Error104 : in line [" + ctx.getStart().getLine() + ":" + ctx.fieldName.getCharPositionInLine() + "], field [" + ctx.fieldName.getText() + "] has been defined already";
             System.out.println(errorMessage);
+            stg.addEntry(key, value);
         }
     }
     @Override
@@ -143,7 +146,8 @@ public class HashTable implements japyListener {
     public void exitAccess_modifier(japyParser.Access_modifierContext ctx) {
 
     }
-    public static String concatenateParameters(String methodDeclaration) {
+    public static String
+    concatenateParameters(String methodDeclaration) {
         // Regular expression to match the parameter list in the method declaration
         String paramPattern = "\\(\\s*(.*?)\\s*\\)";
         // Compile the pattern
@@ -214,6 +218,15 @@ public class HashTable implements japyListener {
                 String returnn = stg.evaluateExpressionType(ctx.s.s1.s6.e);
                 if (ctx.s.s1.s6.getText().contains("\"")) {
                     returnn = "string";
+                }
+                // Regular expression to match any alphabetic character
+                Pattern pattern = Pattern.compile("^[a-zA-Z]+$");
+                Matcher matcher = pattern.matcher(ctx.s.s1.s6.e.getText());
+
+                // Check if the string contains any alphabetic character
+                boolean hasAlphabet = matcher.find();
+                if (hasAlphabet && !ctx.s.s1.s6.e.getText().contains("true") && !ctx.s.s1.s6.e.getText().contains("false")){
+                    returnn = stg.getTypeOfVariable(ctx.s.s1.s6.e.getText());
                 }
                 if (!returnn.equals(ctx.t.getText())) {
                     System.out.println("Error210 : in line [" + ctx.getStart().getLine() + ":" + ctx.methodName.getCharPositionInLine() + "],ReturnType of this method must be " + ctx.t.getText() );
@@ -484,23 +497,29 @@ public class HashTable implements japyListener {
     public void enterStatementAssignment(japyParser.StatementAssignmentContext ctx) {
         // create symbol table entry
         String key = "key = Assign_" + ctx.left.getText();
-        String value = "Value = (name: " + ctx.right.getText() + ")(first appearance: " + ctx.start.getLine() + ")";
+        String value = "Value = (name: " + ctx.left.getText() + ")(first appearance: " + ctx.start.getLine() + ")";
         stg.addEntry(key, value);
 
-        String leftType = stg.evaluateExpressionType(ctx.left);
-        String rightType = stg.evaluateExpressionType(ctx.right);
-        if (!leftType.equals(rightType)) {
-            System.err.println("Error105 : Type mismatch error: Left expression type "+ leftType + " does not match right expression type " + rightType);
-            // Or handle the error as per your application's requirements
-        }
+//        String leftType = stg.evaluateExpressionType(ctx.left);
+//        String rightType = stg.evaluateExpressionType(ctx.right);
+//        System.out.println(leftType);
+//        System.out.println(rightType);
+//        if (!leftType.equals(rightType)) {
+//            System.err.println("Error105 : Type mismatch error: Left expression type "+ leftType + " does not match right expression type " + rightType);
+//            // Or handle the error as per your application's requirements
+//        }
 
         // Finding the type of variable 'x'
         String typeOfX = stg.getTypeOfVariable(ctx.left.getText());
-//        System.out.println(typeOfX);
-        if (typeOfX != null) {
-            System.out.println("Type of 'left': " + typeOfX);
-        } else {
-            System.out.println("Variable 'left' not found or type information not available.");
+        String typeOfY = stg.getTypeOfVariable(ctx.right.getText());
+        if (typeOfX != null && typeOfY != null) {
+            if (!typeOfX.equals(typeOfY)) {
+                System.out.println("Error105 : in line [" + ctx.start.getLine() + ":" + ctx.left.getStart().getCharPositionInLine()+ "] Type mismatch error: Left expression type \""+ typeOfX + "\" does not match right expression type \"" + typeOfY +"\"");
+            }
+        } else if (typeOfX == null) {
+            System.out.println("Error106: in line [" + ctx.start.getLine() + ":_" + "] Variable \"" + ctx.left.getText() + "\" not found or type information not available.");
+        }else if (typeOfY == null) {
+            System.out.println("Error106: in line [" + ctx.start.getLine() + "] Variable \"" + ctx.right.getText() + "\" not found or type information not available.");
         }
 
     }
