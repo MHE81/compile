@@ -63,14 +63,14 @@ public class HashTable implements japyListener {
         // create symbol entry
         String className = ctx.className.getText();
         String classNameSymbol = "class_" + className;
-        String key = "key = " + classNameSymbol;
+        String key = "Key = " + classNameSymbol;
         String value = "Value = (name: " + className + ")"; // (extends: " + parent + ")";
         if (ctx.access_modifier() != null){
             accessModifier = ctx.access_modifier().getText();
         }
-        value.concat("(accessModifier: " + accessModifier + ")");
+        value = value.concat("(accessModifier: " + accessModifier + ")");
         if (ctx.classParent != null){
-            value.concat("(inherits: " + ctx.classParent.getText() + ")");
+            value = value.concat("(inherits: " + ctx.classParent.getText() + ")");
         }
         int start_lineNumber = ctx.getStart().getLine();
         int stop_lineNumber = ctx.getStop().getLine();
@@ -129,7 +129,8 @@ public class HashTable implements japyListener {
             if (repeated) {
                 String errorMessage = "Error104 : in line [" + ctx.getStart().getLine() + ":" + ctx.fieldName.getCharPositionInLine() + "], field [" + ctx.fieldName.getText() + "] has been defined already";
                 System.out.println(errorMessage);
-                stg.addEntry(key, value);
+//                stg.addEntry(key, value);
+                key = "Key = Field_" + ctx.ID(i).getText() + "_" + ctx.getStart().getLine() + "_" + ctx.fieldName.getCharPositionInLine();
             }
             stg.addEntry(key, value);
         }
@@ -214,6 +215,7 @@ public class HashTable implements japyListener {
         if (repeated){
             String errorMessage = "Error102 : in line [" + ctx.getStart().getLine() + ":" + ctx.methodName.getCharPositionInLine() + "], method [" + ctx.methodName.getText() + "] has been defined already";
             System.out.println(errorMessage);
+            key = "Key = Function_" + methodName + "_" + ctx.getStart().getLine() + "_" + ctx.methodName.getCharPositionInLine();
         }
         if (ctx.s.s1 !=null) {
             if (ctx.s.s1.s6 != null) {
@@ -524,9 +526,9 @@ public class HashTable implements japyListener {
                 System.out.println("Error105 : in line [" + ctx.start.getLine() + ":" + ctx.left.getStart().getCharPositionInLine()+ "] Type mismatch error: Left expression type \""+ typeOfX + "\" does not match right expression type \"" + typeOfY +"\"");
             }
         } else if (typeOfX == null) {
-            System.out.println("Error106: in line [" + ctx.start.getLine() + ":_" + "] Variable \"" + ctx.left.getText() + "\" not found or type information not available.");
+            System.out.println("Error106: in line [" + ctx.start.getLine() + ":_] Variable \"" + ctx.left.getText() + "\" not found or type information not available.");
         }else if (typeOfY == null) {
-            System.out.println("Error106: in line [" + ctx.start.getLine() + "] Variable \"" + ctx.right.getText() + "\" not found or type information not available.");
+            System.out.println("Error106: in line [" + ctx.start.getLine() + ":_] Variable \"" + ctx.right.getText() + "\" not found or type information not available.");
         }
 
     }

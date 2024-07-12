@@ -2,16 +2,17 @@ class MyClass inherits MElika begin
     public field double x, y, v
     private field double z
     field string s
-
     func myMethod(param1: double, param2: double, param3: string) returns bool begin
         var a = 10, b = 20.5, d=75
         var c = love(10)
         if(n<2)
-            s++
+            x = 10
         else
             m++
+        
 	    mel = 10+c
 	    d++
+        param1 = s
         c--
         return true
     end
@@ -43,14 +44,12 @@ end
 public class MElika inherits Fateme begin
     private field double x, y
     private field double z
-
     func myMethod(param1: int, param2: double) returns bool begin
         var a = 10, b = 20.5
         var c = a + b
 	while(c == true) begin
         while(f==10)
-            f++
-        c++
+            c++
 		continue
         end
         return true

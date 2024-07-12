@@ -72,12 +72,12 @@ public class SymbolTable {
         SymbolTable current = this;
         while (current != null) {
             for (Map.Entry<String, SymbolTableEntry> entry : current.symbolTable.entrySet()) {
-                if (entry.getKey().contains("Field_")) {
+                if (entry.getKey().contains("Key = Field_")) {
                     if (entry.getValue().value.contains(variableName)) {
                         String value = entry.getValue().value;
                         int typeStartIndex = value.indexOf("(Type: ") + "(Type: ".length();
                         int typeEndIndex = value.indexOf(")", typeStartIndex);
-                        if (typeStartIndex != -1 && typeEndIndex != -1) {
+                        if (typeEndIndex != -1) {
                             return value.substring(typeStartIndex, typeEndIndex);
                         }
                     }
@@ -86,7 +86,7 @@ public class SymbolTable {
                         String value = entry.getValue().value;
                         int typeStartIndex = value.indexOf("(type: ") + "(Type: ".length();
                         int typeEndIndex = value.indexOf(")", typeStartIndex);
-                        if (typeStartIndex != -1 && typeEndIndex != -1) {
+                        if (typeEndIndex != -1) {
                             return value.substring(typeStartIndex, typeEndIndex);
                         }
                     }
