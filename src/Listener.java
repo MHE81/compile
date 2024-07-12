@@ -24,9 +24,9 @@ public class Listener implements japyListener {
 
     @Override
     public void enterClassDeclaration(japyParser.ClassDeclarationContext ctx) {
-        String str = "<class '"+ctx.className.getText()+"'";
+        String str = "<class '" + ctx.className.getText()+"'";
         if(ctx.access_modifier()!= null){
-            str = str.concat(","+ctx.access_modifier().getText());
+            str = str.concat("," + ctx.access_modifier().getText());
         }
         if(ctx.classParent != null){
             str = str.concat(", inherits '"+ctx.classParent.getText()+"'");
@@ -41,7 +41,6 @@ public class Listener implements japyListener {
 
     @Override
     public void enterEntryClassDeclaration(japyParser.EntryClassDeclarationContext ctx) {
-        Hashtable<String, String> Main_class_table = new Hashtable<>();
         System.out.println("<Main class>");
     }
 
@@ -52,7 +51,7 @@ public class Listener implements japyListener {
 
     @Override
     public void enterFieldDeclaration(japyParser.FieldDeclarationContext ctx) {
-        String str = ctx.fieldName.getText();
+        String str = ctx.fieldName.getText() + ":";
 //        if(ctx.ii != null){
 //            List id = printNumberOfIIs(ctx.getText());
         List idd = ctx.ID().subList(1, ctx.ID().size());
@@ -95,13 +94,11 @@ public class Listener implements japyListener {
         if (!matcher.find()) {
             return "";
         }
-
         String paramList = matcher.group(1);
 
         if (paramList.isEmpty()) {
             return "";
         }
-
         // Split the parameter list by comma
         String[] params = paramList.split(",");
 
@@ -120,7 +117,6 @@ public class Listener implements japyListener {
                         .append(")");
             }
         }
-
         // Return the concatenated string
         return concatenatedParams.toString();
     }
@@ -144,40 +140,6 @@ public class Listener implements japyListener {
 
     @Override
     public void enterClosedStatement(japyParser.ClosedStatementContext ctx) {
-//        if(ctx.s1 != null){
-//            enterStatementBlock(ctx.s1);
-//        }
-//        if (ctx.conditionalStat != null ){
-//            enterClosedConditional(ctx.conditionalStat);
-//        }
-//        if(ctx.s3 != null){
-//            enterStatementClosedLoop(ctx.s3);
-//        }
-//        if(ctx.s4 != null){
-//            enterStatementWrite(ctx.s4);
-//        }
-//        if(ctx.s5 != null){
-//            enterStatementAssignment(ctx.s5);
-//        }
-//        if(ctx.s6 != null){
-//            enterStatementReturn(ctx.s6);
-//        }
-//        if(ctx.s7 != null){
-//            enterStatementVarDef(ctx.s7);
-//        }
-//        if(ctx.s8 != null){
-//            enterStatementContinue(ctx.s8);
-//        }
-//        if(ctx.s9 != null){
-//            enterStatementBreak(ctx.s9);
-//        }
-//        if(ctx.incStat != null){
-//            enterStatementInc(ctx.incStat);
-//        }
-//        if(ctx.decStat != null){
-//            enterStatementDec(ctx.decStat);
-//        }
-
     }
 
     @Override
@@ -461,7 +423,7 @@ public class Listener implements japyListener {
 
     @Override
     public void enterStatementDec(japyParser.StatementDecContext ctx) {
-        String str = "1-" + ctx.expression().getText() + " -> " + ctx.expression().getText();
+        String str = ctx.expression().getText() + "-1" + " -> " + ctx.expression().getText();
         System.out.println(str);
     }
 

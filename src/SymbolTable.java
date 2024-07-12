@@ -3,33 +3,33 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-class MethodEntry extends SymbolTableEntry {
-    public String returnType;
-    public MethodEntry(String key, String value, String returnType) {
-        super(key, value);
-        this.returnType = returnType;
-    }
-    @Override
-    public void print() {
-        super.print();
-        System.out.println("Return Type: " + returnType);
-    }
-}
+//class MethodEntry extends SymbolTableEntry {
+//    public String returnType;
+//    public MethodEntry(String key, String value, String returnType) {
+//        super(key, value);
+//        this.returnType = returnType;
+//    }
+//    @Override
+//    public void print() {
+//        super.print();
+//        System.out.println("Return Type: " + returnType);
+//    }
+//}
 
 
-class VariableEntry extends SymbolTableEntry {
-    public String type;
-
-    public VariableEntry(String key, String value, String type) {
-        super(key, value);
-        this.type = type;
-    }
-    @Override
-    public void print() {
-        super.print();
-        System.out.println("Type: " + type);
-    }
-}
+//class VariableEntry extends SymbolTableEntry {
+//    public String type;
+//
+//    public VariableEntry(String key, String value, String type) {
+//        super(key, value);
+//        this.type = type;
+//    }
+//    @Override
+//    public void print() {
+//        super.print();
+//        System.out.println("Type: " + type);
+//    }
+//}
 
 class SymbolTableEntry{
     public String key;
@@ -104,7 +104,6 @@ public class SymbolTable {
             }
         }
         System.out.println("--------------------------------------------------------\n");
-
     }
     public SymbolTable addChild(SymbolTable child) {
         children.add(child);

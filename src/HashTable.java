@@ -4,7 +4,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -123,12 +125,12 @@ public class HashTable implements japyListener {
             }
             value += "(accessModifier: " + accessModifier + ")";
             value += "(Type: " + ctx.fieldType.getText() + ")";
-            stg.addEntry(key, value);
-        }
-        boolean repeated = stg.containsNameInGraph(ctx.fieldName.getText());
-        if (!repeated) {
-            String errorMessage = "Error104 : in line [" + ctx.getStart().getLine() + ":" + ctx.fieldName.getCharPositionInLine() + "], field [" + ctx.fieldName.getText() + "] has been defined already";
-            System.out.println(errorMessage);
+            boolean repeated = stg.containsNameInGraph(ctx.ID(i).getText());
+            if (repeated) {
+                String errorMessage = "Error104 : in line [" + ctx.getStart().getLine() + ":" + ctx.fieldName.getCharPositionInLine() + "], field [" + ctx.fieldName.getText() + "] has been defined already";
+                System.out.println(errorMessage);
+                stg.addEntry(key, value);
+            }
             stg.addEntry(key, value);
         }
     }
@@ -205,11 +207,11 @@ public class HashTable implements japyListener {
         String key = "Key = Function_" + methodName;
         String value = new String("Value = (name: " + methodName + ")" + "(AccessModifier: " + accessModifier + ")(Return: " + ctx.t.getText() + ")");
         value += "\n" + concatenateParameters(ctx.getText());
-        stg.addEntry(key, value);
-        stg.enterBlock(methodName, ctx.getStart().getLine(), ctx.getStop().getLine());
-        Details.addMethod(stg.getCurentNodeName(), ctx.methodName.getText(), accessModifier);
+//        stg.addEntry(key, value);
+//        stg.enterBlock(methodName, ctx.getStart().getLine(), ctx.getStop().getLine());
+//        Details.addMethod(stg.getCurentNodeName(), ctx.methodName.getText(), accessModifier);
         boolean repeated = stg.containsNameInGraph(ctx.methodName.getText());
-        if (!repeated){
+        if (repeated){
             String errorMessage = "Error102 : in line [" + ctx.getStart().getLine() + ":" + ctx.methodName.getCharPositionInLine() + "], method [" + ctx.methodName.getText() + "] has been defined already";
             System.out.println(errorMessage);
         }
@@ -233,6 +235,8 @@ public class HashTable implements japyListener {
                 }
             }
         }
+        stg.addEntry(key, value);
+        stg.enterBlock(methodName, ctx.getStart().getLine(), ctx.getStop().getLine());
     }
 
     @Override
@@ -250,13 +254,16 @@ public class HashTable implements japyListener {
     public void exitClosedStatement(japyParser.ClosedStatementContext ctx) {
 
     }
+//    Queue<String> queue = new LinkedList<>();
     public void enterClosedonditional_if(japyParser.ClosedConditionalContext ctx) {
         stg.enterBlock("If", ctx.getStart().getLine(), ctx.getStop().getLine());
+//        queue.add()
     }
     public void enterClosedConditional_elif(japyParser.ClosedConditionalContext ctx) {
         for (int i = 0; i < ctx.expression().size()-1; i++) {
             stg.enterBlock("Elif", ctx.getStart().getLine(), ctx.getStop().getLine());
         }
+
     }
     public void enterClosedConditional_else(japyParser.ClosedConditionalContext ctx) {
         stg.enterBlock("Else", ctx.getStart().getLine(), ctx.getStop().getLine());

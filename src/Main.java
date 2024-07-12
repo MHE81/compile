@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        System.out.println("Hello world!");
+//        System.out.println("Hello world!");
         CharStream stream = CharStreams.fromFileName("1.txt");
         japyLexer lexer = new japyLexer(stream);
         TokenStream tokens = new CommonTokenStream(lexer);

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SymbolTableGraph {
-    public final SymbolTable rootNode;
-    public SymbolTable currentNode;
+    private final SymbolTable rootNode;
+    private SymbolTable currentNode;
 
     public String getTypeOfVariable(String variableName) {
         return currentNode.getType(variableName);
@@ -14,20 +14,21 @@ public class SymbolTableGraph {
         return containsNameInNode(rootNode, name);
     }
     public boolean containsNameInNode(SymbolTable node, String name) {
-        if (node.symbolTable.containsKey(name)) {
-            if (!(node.symbolTable.containsKey("Field")) && node.symbolTable.containsKey("Function")) {
-                return true;
-            } else if (node.symbolTable.containsKey("Field") && !(node.symbolTable.containsKey("Function"))) {
-                return true;
-            }
+        String str = "Field_" + name;
+        boolean is_repeated  = node.symbolTable.containsKey(str);
+        if (is_repeated) {
+//            if (!(node.symbolTable.containsKey("Field")) && node.symbolTable.containsKey("Function")) {
+//                return true;
+//            } else if (node.symbolTable.containsKey("Field") && !(node.symbolTable.containsKey("Function"))) {
+            return true;
+//            }
+        }
+        else if (node.symbolTable.containsKey("Function_" + name)) {
+            return true;
         }
         for (SymbolTable child : node.getChildren()) {
             if (containsNameInNode(child, name)) {
-                if (!(containsNameInNode(child, "Field")) && containsNameInNode(child, "Function")) {
-                    return true;
-                } else if (containsNameInNode(child, "Field") && !(containsNameInNode(child, "Function"))) {
-                    return true;
-                }
+                return true;
             }
         }
         return false;
@@ -80,16 +81,16 @@ public class SymbolTableGraph {
         return "unknown";
     }
 
-    public SymbolTableEntry lookup(String name) {
-        SymbolTable current = currentNode;
-        while (current != null) {
-            if (current.symbolTable.containsKey(name)) {
-                return current.symbolTable.get(name);
-            }
-            current = current.getParent();
-        }
-        return null;
-    }
+//    public SymbolTableEntry lookup(String name) {
+//        SymbolTable current = currentNode;
+//        while (current != null) {
+//            if (current.symbolTable.containsKey(name)) {
+//                return current.symbolTable.get(name);
+//            }
+//            current = current.getParent();
+//        }
+//        return null;
+//    }
     public SymbolTableGraph(japyParser.ProgramContext ctx) {
         rootNode = new SymbolTable("program", null, ctx.getStart().getLine(),ctx.getStop().getLine() );
         currentNode = rootNode;
